@@ -23,13 +23,13 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         String registration = userRequest.getClientRegistration().getRegistrationId();
         OAuth2Response oAuth2Response = null;
 
-        if(registration.equals("kakao")) {
+        if("kakao".equals(registration)) {
             log.info("Kakao oAuth Client");
             oAuth2Response = new KakaoResponse(oAuth2User.getAttributes());
-        } else if(registration.equals("naver")) {
+        } else if("naver".equals(registration)) {
             log.info("Naver oAuth Client");
             oAuth2Response = new NaverResponse(oAuth2User.getAttributes());
-        } else if(registration.equals("google")) {
+        } else if("google".equals(registration)) {
             log.info("Google oAuth Client");
             oAuth2Response = new GoogleResponse(oAuth2User.getAttributes());
         } else {
