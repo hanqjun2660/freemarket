@@ -52,7 +52,7 @@ public class SecurityConfig {
 
         // 경로별 인가(여기도 필요한거 추가해서 쓰자)
         http.authorizeHttpRequests((auth) -> auth
-                .requestMatchers("","/example").permitAll()
+                .requestMatchers("/","/example").permitAll()
                 .anyRequest().authenticated());
 
         // Session

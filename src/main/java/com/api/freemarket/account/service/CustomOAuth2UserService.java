@@ -1,20 +1,30 @@
 package com.api.freemarket.account.service;
 
-import com.api.freemarket.account.oAuth.GoogleResponse;
-import com.api.freemarket.account.oAuth.KakaoResponse;
-import com.api.freemarket.account.oAuth.NaverResponse;
-import com.api.freemarket.account.oAuth.OAuth2Response;
+import com.api.freemarket.account.Entity.UserEntity;
+import com.api.freemarket.account.model.UserDTO;
+import com.api.freemarket.account.oAuth.*;
+import com.api.freemarket.account.repository.RoleRepository;
+import com.api.freemarket.account.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
+
+    private final ModelMapper modelMapper;
+
+    private final UserRepository userRepository;
+
+    private final RoleRepository roleRepository;
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) {
@@ -36,6 +46,29 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             return null;        // 처리좀 고민해봐야 할듯
         }
 
-        return null;
+        String memberId = oAuth2Response.getProvider() + "_" + oAuth2Response.getProviderId();
+
+        Optional<UserEntity> existUser = Optional.ofNullable(userRepository.findByMemberId(memberId));
+
+        if(!existUser.isPresent()) {
+            UserEntity registUser = UserEntity.builder()
+                    .name(oAuth2Response.getName())
+                    .email(oAuth2Response.getEmail())
+                    .nickname(oAuth2Response.getName())
+                    .memberId(memberId)
+                    .profileImg(oAuth2Response.getProfileImage())
+                    .build();
+
+            userRepository.save(registUser);
+            return new CustomOAuth2User(modelMapper.map(registUser, UserDTO.class));
+        } else {
+            String role = roleRepository.findByMemberNo(existUser.get().getMemberNo());
+            UserEntity userEntity = existUser.get();
+
+            UserDTO userDTO = modelMapper.map(userEntity, UserDTO.class);
+            userDTO.setRole(role);
+
+            return new CustomOAuth2User(userDTO);
+        }
     }
 }

@@ -19,8 +19,13 @@ public class JWTUtil {
     }
 
     // 토큰에서 회원번호를 추출
-    public String getUserNo(String token) {
-        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("userNo", String.class);
+    public Long getUserNo(String token) {
+        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("userNo", Long.class);
+    }
+
+    // 토큰에서 권한 추출
+    public String getRole(String token) {
+        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("role", String.class);
     }
 
     // 토큰에서 회원 ID 추출
@@ -45,10 +50,11 @@ public class JWTUtil {
      * @param expiredMs -> 유효 일자
      * @return
      */
-    public String createToken(String category, String userNo, Long expiredMs) {
+    public String createToken(String category, Long userNo, String role, Long expiredMs) {
         return Jwts.builder()
                 .claim("category", category)
                 .claim("userNo", userNo)
+                .claim("role", role)
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + expiredMs))
                 .signWith(secretKey)

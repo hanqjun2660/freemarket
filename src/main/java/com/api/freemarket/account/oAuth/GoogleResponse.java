@@ -12,22 +12,22 @@ public class GoogleResponse implements OAuth2Response {
 
     @Override
     public String getProvider() {
-        return null;
+        return "google";
     }
 
     @Override
     public String getProviderId() {
-        return null;
+        return attribute.get("sub").toString();
     }
 
     @Override
     public String getEmail() {
-        return null;
+        return attribute.get("email").toString();
     }
 
     @Override
     public String getName() {
-        return null;
+        return attribute.get("name").toString();
     }
 
     @Override

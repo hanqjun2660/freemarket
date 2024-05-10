@@ -18,26 +18,26 @@ public class KakaoResponse implements OAuth2Response {
 
     @Override
     public String getProvider() {
-        return null;
+        return "kakao";
     }
 
     @Override
     public String getProviderId() {
-        return null;
+        return this.providerId;
     }
 
     @Override
     public String getEmail() {
-        return null;
+        return this.account.get("email").toString();
     }
 
     @Override
     public String getName() {
-        return null;
+        return this.properties.get("nickname").toString();
     }
 
     @Override
     public String getProfileImage() {
-        return null;
+        return this.properties.get("profile_image").toString();
     }
 }
