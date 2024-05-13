@@ -1,9 +1,9 @@
 package com.api.freemarket.account.repository;
 
-import com.api.freemarket.account.Entity.UserEntity;
+import com.api.freemarket.account.Entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface UserRepository extends JpaRepository<UserEntity, Long> {
+public interface UserRepository extends JpaRepository<User, Long> {
 
-    UserEntity findByMemberId(String memberId);
+    User findByMemberId(String memberId);
 }

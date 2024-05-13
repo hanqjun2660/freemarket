@@ -1,7 +1,7 @@
 package com.api.freemarket.account.handler;
 
+import com.api.freemarket.account.model.PrincipalDetails;
 import com.api.freemarket.account.model.RedisData;
-import com.api.freemarket.account.oAuth.CustomOAuth2User;
 import com.api.freemarket.account.service.RedisService;
 import com.api.freemarket.jwt.JWTUtil;
 import jakarta.servlet.ServletException;
@@ -18,9 +18,7 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
@@ -34,9 +32,9 @@ public class CustomOAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHa
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
                                         Authentication authentication) throws IOException, ServletException {
 
-        CustomOAuth2User customOAuth2User = (CustomOAuth2User) authentication.getPrincipal();
+        PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
 
-        Long memberNo = customOAuth2User.getMemberNo();
+        Long memberNo = principalDetails.getMemberNo();
 
         Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
         Iterator<? extends GrantedAuthority> iterator = authorities.iterator();

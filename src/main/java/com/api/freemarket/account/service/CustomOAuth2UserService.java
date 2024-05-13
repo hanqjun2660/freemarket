@@ -1,6 +1,9 @@
 package com.api.freemarket.account.service;
 
-import com.api.freemarket.account.Entity.UserEntity;
+import com.api.freemarket.account.Entity.Role;
+import com.api.freemarket.account.Entity.User;
+import com.api.freemarket.account.enums.RoleName;
+import com.api.freemarket.account.model.PrincipalDetails;
 import com.api.freemarket.account.model.UserDTO;
 import com.api.freemarket.account.oAuth.*;
 import com.api.freemarket.account.repository.RoleRepository;
@@ -48,10 +51,10 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
         String memberId = oAuth2Response.getProvider() + "_" + oAuth2Response.getProviderId();
 
-        Optional<UserEntity> existUser = Optional.ofNullable(userRepository.findByMemberId(memberId));
+        Optional<User> existUser = Optional.ofNullable(userRepository.findByMemberId(memberId));
 
         if(!existUser.isPresent()) {
-            UserEntity registUser = UserEntity.builder()
+            User registUser = User.builder()
                     .name(oAuth2Response.getName())
                     .email(oAuth2Response.getEmail())
                     .nickname(oAuth2Response.getName())
@@ -59,16 +62,24 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                     .profileImg(oAuth2Response.getProfileImage())
                     .build();
 
-            userRepository.save(registUser);
-            return new CustomOAuth2User(modelMapper.map(registUser, UserDTO.class));
+            User findUser = userRepository.save(registUser);
+            Role insertRole = Role.builder()
+                    .memberNo(findUser.getMemberNo())
+                    .name(RoleName.ROLE_USER.toString())
+                    .build();
+            Role role = roleRepository.save(insertRole);
+            UserDTO userDTO = modelMapper.map(findUser, UserDTO.class);
+            userDTO.setRole(role.getName());
+
+            return new PrincipalDetails(userDTO, oAuth2User.getAttributes());
         } else {
-            String role = roleRepository.findByMemberNo(existUser.get().getMemberNo());
-            UserEntity userEntity = existUser.get();
+            Role role = roleRepository.findByMemberNo(existUser.get().getMemberNo());
+            User user = existUser.get();
 
-            UserDTO userDTO = modelMapper.map(userEntity, UserDTO.class);
-            userDTO.setRole(role);
+            UserDTO userDTO = modelMapper.map(user, UserDTO.class);
+            userDTO.setRole(role.getName());
 
-            return new CustomOAuth2User(userDTO);
+            return new PrincipalDetails(userDTO, oAuth2User.getAttributes());
         }
     }
 }
