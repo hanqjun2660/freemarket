@@ -60,4 +60,8 @@ public class RedisService {
         return value.equals("false");
     }
 
+    public boolean checkExistsKey(String key) {
+        return redisTemplate.hasKey(key) != null;
+    }
+
 }

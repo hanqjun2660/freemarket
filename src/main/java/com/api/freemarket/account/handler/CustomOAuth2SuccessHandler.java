@@ -41,15 +41,15 @@ public class CustomOAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHa
         GrantedAuthority auth = iterator.next();
         String role = auth.getAuthority();
 
-        String accessToken = jwtUtil.createToken("access", memberNo, role, 3600L);
-        String refreshToken = jwtUtil.createToken("refresh", memberNo, role, 604800L);
+        String accessToken = jwtUtil.createToken("access", memberNo, role, 60000L);
+        String refreshToken = jwtUtil.createToken("refresh", memberNo, role, 86400000L);
 
         RedisData redisData = new RedisData();
         redisData.setMemberNo(memberNo);
         redisData.setRole(role);
         redisData.setRefreshToken(refreshToken);
 
-        redisService.setValues(String.valueOf(memberNo), redisData, Duration.ofMillis(604800L));
+        redisService.setValues(String.valueOf(memberNo), redisData, Duration.ofMillis(86400000L));
 
         response.setHeader("Authorization", "Bearer " + accessToken);
         response.addCookie(createCookie("refresh", refreshToken));

@@ -66,12 +66,12 @@ public class ReissueController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
-        String newAccessToken = jwtUtil.createToken("access", userNo, role, 3600L);
-        String newRefreshToken = jwtUtil.createToken("refresh", userNo, role, 604800L);
+        String newAccessToken = jwtUtil.createToken("access", userNo, role, 60000L);
+        String newRefreshToken = jwtUtil.createToken("refresh", userNo, role, 86400000L);
 
         RedisData updateData = new RedisData(userNo, role, refreshToken);
 
-        redisService.setValues(String.valueOf(userNo), updateData, Duration.ofMillis(604800L));
+        redisService.setValues(String.valueOf(userNo), updateData, Duration.ofMillis(86400000L));
 
         // 응답
         response.setHeader("Authorization", "Bearer " + newAccessToken);

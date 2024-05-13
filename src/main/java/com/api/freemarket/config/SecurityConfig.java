@@ -1,5 +1,6 @@
 package com.api.freemarket.config;
 
+import com.api.freemarket.account.handler.CustomLogoutHandler;
 import com.api.freemarket.account.handler.CustomOAuth2SuccessHandler;
 import com.api.freemarket.account.service.CustomOAuth2UserService;
 import com.api.freemarket.jwt.JWTFilter;
@@ -9,6 +10,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -25,6 +28,8 @@ public class SecurityConfig {
 
     private final CustomOAuth2SuccessHandler customOAuth2SuccessHandler;
 
+    private final CustomLogoutHandler customLogoutHandler;
+
     private final CustomOAuth2UserService customOAuth2UserService;
 
     private final JWTUtil jwtUtil;
@@ -36,13 +41,16 @@ public class SecurityConfig {
         http.cors(corsCustomizer -> corsCustomizer.configurationSource(corsConfiguration()));
 
         // csrf
-        http.csrf((auth) -> auth.disable());
+        http.csrf(AbstractHttpConfigurer::disable);
+
+        // h2 콘솔 보려면 이거 해라(안쓰면 지우자)
+        http.headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin));
 
         // jwt filter
         http.addFilterBefore(new JWTFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class);
 
         // formLogin
-        http.formLogin((auth) -> auth.disable());
+        http.formLogin(AbstractHttpConfigurer::disable);
 
         // oAuth2
         http.oauth2Login((oauth2) -> oauth2
@@ -50,10 +58,15 @@ public class SecurityConfig {
                 .userInfoEndpoint(userInfoEndpointConfig -> userInfoEndpointConfig
                         .userService(customOAuth2UserService)));
 
+        http.logout((auth) -> auth
+                .logoutUrl("/logout")
+                .logoutSuccessHandler(customLogoutHandler)
+                .deleteCookies("refresh"));
+
         // 경로별 인가(여기도 필요한거 추가해서 쓰자)
         http.authorizeHttpRequests((auth) -> auth
-                .requestMatchers("/","/example", "/login").permitAll()
-                .anyRequest().authenticated());
+                .requestMatchers("/logout").authenticated()
+                .anyRequest().permitAll());
 
         // Session
         http.sessionManagement((session) -> session
