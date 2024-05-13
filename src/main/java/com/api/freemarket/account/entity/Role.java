@@ -1,4 +1,4 @@
-package com.api.freemarket.account.Entity;
+package com.api.freemarket.account.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

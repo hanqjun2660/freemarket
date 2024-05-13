@@ -1,7 +1,7 @@
 package com.api.freemarket.account.service;
 
-import com.api.freemarket.account.Entity.Role;
-import com.api.freemarket.account.Entity.User;
+import com.api.freemarket.account.entity.Role;
+import com.api.freemarket.account.entity.User;
 import com.api.freemarket.account.enums.RoleName;
 import com.api.freemarket.account.model.PrincipalDetails;
 import com.api.freemarket.account.model.UserDTO;
