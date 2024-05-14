@@ -31,10 +31,14 @@ public class ReissueController {
 
         Cookie[] cookies = request.getCookies();
 
-        for(Cookie cookie : cookies) {
-            if("refresh".equals(cookie.getName())) {
-                refreshToken = cookie.getValue();
+        try {
+            for(Cookie cookie : cookies) {
+                if("refresh".equals(cookie.getName())) {
+                    refreshToken = cookie.getValue();
+                }
             }
+        } catch (NullPointerException e) {
+            CommonResponse.ERROR("Cookie가 존재하지 않음");
         }
 
         // cookie에 실제로 토큰이 있는지
