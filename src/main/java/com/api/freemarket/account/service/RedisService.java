@@ -6,6 +6,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
@@ -41,19 +42,13 @@ public class RedisService {
 
     // redis에 저장된 refreshToken 조회
     public RedisData getValues(String key) {
-        String jsonValue = redisTemplate.opsForValue().get(key).toString();
+        RedisData jsonValue = (RedisData) redisTemplate.opsForValue().get(key);
 
         if(ObjectUtils.isEmpty(jsonValue)) {
             return null;
         }
 
-        ObjectMapper objectMapper = new ObjectMapper();
-
-        try {
-            return objectMapper.readValue(jsonValue, RedisData.class);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
+        return jsonValue;
     }
 
     public boolean checkExistsValue(String value) {
