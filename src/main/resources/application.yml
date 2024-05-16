@@ -9,6 +9,8 @@ server:
 spring:
   jwt:
     secret: vmfhaltmskdlstkfkdgodyroqkfwkdbalroqkfwkdbalaaaaaaaaaaaaaaaabbbbb
+    access-duration: 60000
+    refresh-duration: 86400000
 
   data:
     redis:

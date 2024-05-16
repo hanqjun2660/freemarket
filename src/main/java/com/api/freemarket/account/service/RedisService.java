@@ -1,25 +1,30 @@
 package com.api.freemarket.account.service;
 
 import com.api.freemarket.account.model.RedisData;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.api.freemarket.jwt.JWTUtil;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
 import java.time.Duration;
-import java.util.HashMap;
-import java.util.Map;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class RedisService {
+
+    @Value("${spring.jwt.access-duration}")
+    private Long accessDuration;
+
+    @Value("${spring.jwt.refresh-duration}")
+    private Long refreshDuration;
+
+    private final JWTUtil jwtUtil;
 
     private final RedisTemplate<String, Object> redisTemplate;
 
@@ -57,6 +62,28 @@ public class RedisService {
 
     public boolean checkExistsKey(String key) {
         return redisTemplate.hasKey(key) != null;
+    }
+
+    /**
+     * 토큰 생성 후 redis insert
+     * @param memberNo
+     * @param role
+     * @param response
+     */
+    public void tokenWithInsertRedis(Long memberNo, String role, HttpServletResponse response) {
+
+        String accessToken = jwtUtil.createToken("access", memberNo, role, accessDuration);
+        String refreshToken = jwtUtil.createToken("refresh", memberNo, role, refreshDuration);
+
+        RedisData redisData = new RedisData();
+        redisData.setMemberNo(memberNo);
+        redisData.setRole(role);
+        redisData.setRefreshToken(refreshToken);
+
+        setValues(String.valueOf(memberNo), redisData, Duration.ofMillis(refreshDuration));
+
+        response.setHeader("Authorization", "Bearer " + accessToken);
+        response.addCookie(jwtUtil.createCookie("refresh", refreshToken));
     }
 
 }

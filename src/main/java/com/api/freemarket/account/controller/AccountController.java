@@ -1,6 +1,8 @@
 package com.api.freemarket.account.controller;
 
+import com.api.freemarket.account.model.PrincipalDetails;
 import com.api.freemarket.account.model.RedisData;
+import com.api.freemarket.account.model.UserDTO;
 import com.api.freemarket.account.service.RedisService;
 import com.api.freemarket.common.CommonResponse;
 import com.api.freemarket.jwt.JWTUtil;
@@ -9,20 +11,57 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.Duration;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.Optional;
 
 @RestController
 @Slf4j
 @RequiredArgsConstructor
-public class ReissueController {
+@RequestMapping("/account")
+public class AccountController {
+
+    private final AuthenticationManager authenticationManager;
 
     private final JWTUtil jwtUtil;
 
     private final RedisService redisService;
+
+    @PostMapping("/login")
+    public CommonResponse login(@RequestBody UserDTO userDTO, HttpServletResponse response) {
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(userDTO.getMemberId(), userDTO.getPassword())
+            );
+
+            PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
+
+            Long memberNo = principalDetails.getMemberNo();
+
+            Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+            Iterator<? extends GrantedAuthority> iterator = authorities.iterator();
+            GrantedAuthority auth = iterator.next();
+            String role = auth.getAuthority();
+
+            redisService.tokenWithInsertRedis(memberNo, role, response);
+
+            return CommonResponse.OK(null);
+
+        } catch (BadCredentialsException e) {
+            return CommonResponse.ERROR("아이디 혹은 패스워드가 잘못되었습니다.");
+        }
+    }
 
     @PostMapping("/reissue")
     public CommonResponse reissue(HttpServletRequest request, HttpServletResponse response) {
