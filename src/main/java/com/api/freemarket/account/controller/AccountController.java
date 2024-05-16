@@ -122,16 +122,8 @@ public class AccountController {
 
         // 응답
         response.setHeader("Authorization", "Bearer " + newAccessToken);
-        response.addCookie(createCookie("refresh", newRefreshToken));
+        response.addCookie(jwtUtil.createCookie("refresh", newRefreshToken));
 
         return CommonResponse.OK("정상적으로 처리됨");
-    }
-
-    private Cookie createCookie(String key, String value) {
-        Cookie cookie = new Cookie(key, value);
-        cookie.setMaxAge(604800);
-        cookie.setHttpOnly(true);
-
-        return cookie;
     }
 }
