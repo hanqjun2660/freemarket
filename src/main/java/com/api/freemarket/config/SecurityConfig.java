@@ -1,8 +1,8 @@
 package com.api.freemarket.config;
 
-import com.api.freemarket.account.handler.CustomLogoutHandler;
-import com.api.freemarket.account.handler.CustomOAuth2SuccessHandler;
-import com.api.freemarket.account.service.CustomOAuth2UserService;
+import com.api.freemarket.domain.account.handler.CustomLogoutHandler;
+import com.api.freemarket.domain.account.handler.CustomOAuth2SuccessHandler;
+import com.api.freemarket.domain.account.service.CustomOAuth2UserService;
 import com.api.freemarket.jwt.JWTFilter;
 import com.api.freemarket.jwt.JWTUtil;
 import lombok.RequiredArgsConstructor;

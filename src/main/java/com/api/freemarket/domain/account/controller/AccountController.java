@@ -1,9 +1,9 @@
-package com.api.freemarket.account.controller;
+package com.api.freemarket.domain.account.controller;
 
-import com.api.freemarket.account.model.PrincipalDetails;
-import com.api.freemarket.account.model.RedisData;
-import com.api.freemarket.account.model.UserDTO;
-import com.api.freemarket.account.service.RedisService;
+import com.api.freemarket.domain.account.model.PrincipalDetails;
+import com.api.freemarket.domain.account.model.RedisData;
+import com.api.freemarket.domain.account.model.UserDTO;
+import com.api.freemarket.domain.account.service.RedisService;
 import com.api.freemarket.common.CommonResponse;
 import com.api.freemarket.jwt.JWTUtil;
 import jakarta.servlet.http.Cookie;

@@ -1,23 +1,23 @@
-package com.api.freemarket.account.oAuth;
+package com.api.freemarket.domain.account.oAuth;
 
 import java.util.Map;
 
-public class NaverResponse implements OAuth2Response {
+public class GoogleResponse implements OAuth2Response {
 
     private final Map<String, Object> attribute;
 
-    public NaverResponse(Map<String, Object> attribute) {
-        this.attribute = (Map<String, Object>) attribute.get("response");
+    public GoogleResponse(Map<String, Object> attribute) {
+        this.attribute = attribute;
     }
 
     @Override
     public String getProvider() {
-        return "naver";
+        return "google";
     }
 
     @Override
     public String getProviderId() {
-        return attribute.get("id").toString();
+        return attribute.get("sub").toString();
     }
 
     @Override

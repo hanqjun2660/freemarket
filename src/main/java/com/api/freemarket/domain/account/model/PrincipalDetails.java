@@ -1,4 +1,4 @@
-package com.api.freemarket.account.model;
+package com.api.freemarket.domain.account.model;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;

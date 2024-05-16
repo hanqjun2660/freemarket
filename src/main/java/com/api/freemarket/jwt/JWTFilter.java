@@ -1,7 +1,7 @@
 package com.api.freemarket.jwt;
 
-import com.api.freemarket.account.model.PrincipalDetails;
-import com.api.freemarket.account.model.UserDTO;
+import com.api.freemarket.domain.account.model.PrincipalDetails;
+import com.api.freemarket.domain.account.model.UserDTO;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

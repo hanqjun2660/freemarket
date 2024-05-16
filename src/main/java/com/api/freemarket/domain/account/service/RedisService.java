@@ -1,6 +1,6 @@
-package com.api.freemarket.account.service;
+package com.api.freemarket.domain.account.service;
 
-import com.api.freemarket.account.model.RedisData;
+import com.api.freemarket.domain.account.model.RedisData;
 import com.api.freemarket.jwt.JWTUtil;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;

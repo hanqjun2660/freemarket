@@ -1,23 +1,16 @@
-package com.api.freemarket.account.handler;
+package com.api.freemarket.domain.account.handler;
 
-import com.api.freemarket.account.model.PrincipalDetails;
-import com.api.freemarket.account.model.RedisData;
-import com.api.freemarket.account.service.RedisService;
-import com.api.freemarket.jwt.JWTUtil;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.Cookie;
+import com.api.freemarket.domain.account.model.PrincipalDetails;
+import com.api.freemarket.domain.account.service.RedisService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
-import java.time.Duration;
 import java.util.Collection;
 import java.util.Iterator;
 

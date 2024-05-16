@@ -1,4 +1,4 @@
-package com.api.freemarket.account.model;
+package com.api.freemarket.domain.account.model;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.AllArgsConstructor;

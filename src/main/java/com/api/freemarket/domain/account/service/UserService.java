@@ -1,12 +1,11 @@
-package com.api.freemarket.account.service;
+package com.api.freemarket.domain.account.service;
 
-import com.api.freemarket.account.entity.Role;
-import com.api.freemarket.account.entity.User;
-import com.api.freemarket.account.enums.RoleName;
-import com.api.freemarket.account.model.PrincipalDetails;
-import com.api.freemarket.account.model.UserDTO;
-import com.api.freemarket.account.repository.RoleRepository;
-import com.api.freemarket.account.repository.UserRepository;
+import com.api.freemarket.domain.account.entity.User;
+import com.api.freemarket.domain.account.enums.RoleName;
+import com.api.freemarket.domain.account.model.PrincipalDetails;
+import com.api.freemarket.domain.account.model.UserDTO;
+import com.api.freemarket.domain.account.repository.RoleRepository;
+import com.api.freemarket.domain.account.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;

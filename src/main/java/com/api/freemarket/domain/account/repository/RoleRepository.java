@@ -1,6 +1,6 @@
-package com.api.freemarket.account.repository;
+package com.api.freemarket.domain.account.repository;
 
-import com.api.freemarket.account.entity.Role;
+import com.api.freemarket.domain.account.entity.Role;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface RoleRepository extends JpaRepository<Role, Long> {

@@ -1,4 +1,4 @@
-package com.api.freemarket.account.oAuth;
+package com.api.freemarket.domain.account.oAuth;
 
 public interface OAuth2Response {
 

@@ -1,4 +1,4 @@
-package com.api.freemarket.account.model;
+package com.api.freemarket.domain.account.model;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
