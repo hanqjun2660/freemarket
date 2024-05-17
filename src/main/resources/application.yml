@@ -14,10 +14,11 @@ spring:
 
   data:
     redis:
-      host: localhost
+      host: 125.177.131.169
       port: 6379
-      #username:
-      #password:
+      database: 0
+      username: free
+      password: free
 
   security:
     oauth2:
