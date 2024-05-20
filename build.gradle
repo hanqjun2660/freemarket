@@ -46,3 +46,16 @@ dependencies {
 tasks.named('test') {
 	useJUnitPlatform()
 }
+
+bootJar {
+	archiveBaseName = 'free_market_api'
+	archiveFileName = 'free_market_api.jar'
+	archiveVersion = "0.0.1"
+}
+springBoot {
+	mainClass = 'com.api.freemarket.FreemarketApplication'
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
