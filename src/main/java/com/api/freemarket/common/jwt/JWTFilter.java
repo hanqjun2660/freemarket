@@ -1,4 +1,4 @@
-package com.api.freemarket.jwt;
+package com.api.freemarket.common.jwt;
 
 import com.api.freemarket.domain.account.model.PrincipalDetails;
 import com.api.freemarket.domain.account.model.UserDTO;
@@ -15,6 +15,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Arrays;
 
 @RequiredArgsConstructor
 public class JWTFilter extends OncePerRequestFilter {
@@ -66,5 +67,14 @@ public class JWTFilter extends OncePerRequestFilter {
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         filterChain.doFilter(request, response);
+    }
+
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+
+        String[] excludePath = {"/swagger-ui/**"};
+        String path = request.getRequestURI();
+        return Arrays.stream(excludePath).anyMatch(path::startsWith);
     }
 }

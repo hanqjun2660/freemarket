@@ -1,7 +1,7 @@
 package com.api.freemarket.domain.account.handler;
 
 import com.api.freemarket.domain.account.service.RedisService;
-import com.api.freemarket.jwt.JWTUtil;
+import com.api.freemarket.common.jwt.JWTUtil;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

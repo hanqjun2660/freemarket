@@ -1,7 +1,7 @@
 package com.api.freemarket.domain.account.service;
 
 import com.api.freemarket.domain.account.model.RedisData;
-import com.api.freemarket.jwt.JWTUtil;
+import com.api.freemarket.common.jwt.JWTUtil;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

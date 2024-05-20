@@ -5,7 +5,7 @@ import com.api.freemarket.domain.account.model.RedisData;
 import com.api.freemarket.domain.account.model.UserDTO;
 import com.api.freemarket.domain.account.service.RedisService;
 import com.api.freemarket.common.CommonResponse;
-import com.api.freemarket.jwt.JWTUtil;
+import com.api.freemarket.common.jwt.JWTUtil;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

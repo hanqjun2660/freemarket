@@ -1,4 +1,4 @@
-package com.api.freemarket.jwt;
+package com.api.freemarket.common.jwt;
 
 import io.jsonwebtoken.Jwts;
 import jakarta.servlet.http.Cookie;
