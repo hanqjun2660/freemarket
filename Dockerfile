@@ -1,7 +1,7 @@
 # Use an official OpenJDK runtime as a parent image
 FROM openjdk:17-jdk-slim
 
-LABEL image.name="free_market_api"
+LABEL image.name="freemarket-api"
 
 # Set the working directory to /app
 WORKDIR /app
