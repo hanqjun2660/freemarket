@@ -5,7 +5,7 @@ server:
       charset: UTF-8
       enabled: true
       force: true
-  forward-headers-strategy: framework
+  forward-headers-strategy: native
 
 spring:
   jwt:
