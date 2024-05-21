@@ -73,7 +73,17 @@ public class JWTFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
 
-        String[] excludePath = {"/swagger-ui/**"};
+        String[] excludePath = {
+                "/api-docs/json",
+                "/api-docs",
+                "/api/u/v1/social-login",
+                "/swagger-ui/",
+                "/swagger-config",
+                "/swagger.yaml",
+                "/requestBodies",
+                "/swagger-",
+                "/error"
+        };
         String path = request.getRequestURI();
         return Arrays.stream(excludePath).anyMatch(path::startsWith);
     }
