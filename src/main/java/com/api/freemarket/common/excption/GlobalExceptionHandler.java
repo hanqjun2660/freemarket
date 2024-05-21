@@ -1,4 +1,4 @@
-package com.api.freemarket.common.error;
+package com.api.freemarket.common.excption;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.ErrorResponse;
@@ -8,7 +8,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 import java.io.FileNotFoundException;
 
-import static com.api.freemarket.common.error.ErrorCode.*;
+import static com.api.freemarket.common.excption.ErrorCode.*;
 
 @ControllerAdvice
 @Slf4j

@@ -1,4 +1,4 @@
-package com.api.freemarket.common.error;
+package com.api.freemarket.common.excption;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
