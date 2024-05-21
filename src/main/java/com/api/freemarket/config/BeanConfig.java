@@ -18,7 +18,7 @@ public class BeanConfig {
     }
 
     @Bean
-    public ForwardedHeaderFilter forwardedHeaderFilter() {
+    ForwardedHeaderFilter forwardedHeaderFilter() {
         return new ForwardedHeaderFilter();
     }
 }
