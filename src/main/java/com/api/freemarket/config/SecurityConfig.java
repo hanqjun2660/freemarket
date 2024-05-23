@@ -119,7 +119,7 @@ public class SecurityConfig {
                 "/swagger.yaml",
                 "/requestBodies/**",
                 "/swagger-*.yaml",
-                "/api-docs",
+                "/v3/api-docs/**",
                 "/error"
         );
     }
