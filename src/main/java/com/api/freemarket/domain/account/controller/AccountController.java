@@ -1,11 +1,21 @@
 package com.api.freemarket.domain.account.controller;
 
+import com.api.freemarket.common.CommonResponse;
+import com.api.freemarket.common.jwt.JWTUtil;
 import com.api.freemarket.domain.account.model.PrincipalDetails;
 import com.api.freemarket.domain.account.model.RedisData;
 import com.api.freemarket.domain.account.model.UserDTO;
 import com.api.freemarket.domain.account.service.RedisService;
-import com.api.freemarket.common.CommonResponse;
-import com.api.freemarket.common.jwt.JWTUtil;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -26,6 +36,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Optional;
 
+@Tag(name="Account", description = "계정 관련 API")
 @RestController
 @Slf4j
 @RequiredArgsConstructor
@@ -38,6 +49,19 @@ public class AccountController {
 
     private final RedisService redisService;
 
+    @Operation(summary = "로그인", description = "일반 회원의 로그인 API, memberId/password만 입력")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "성공시 200코드 반환",
+                    content = @Content(schema = @Schema(implementation = CommonResponse.class),
+                    examples = @ExampleObject(value = "{\n  \"statusCode\": \"200\",\n  \"message\": \"\",\n  \"data\": \"{}\"\n}"))),
+            @ApiResponse(responseCode = "500", description = "실패시 500코드 및 메세지 반환",
+                    content = @Content(schema = @Schema(implementation = CommonResponse.class),
+                    examples = @ExampleObject(value = "{\n  \"statusCode\": \"500\",\n  \"message\": \"아이디 혹은 패스워드가 잘못되었습니다.\",\n  \"data\": \"{}\"\n}")))
+    })
+    @Parameters(value = {
+            @Parameter(name = "memberId", description = "일반 회원 ID"),
+            @Parameter(name = "password", description = "비밀번호")
+    })
     @PostMapping("/login")
     public CommonResponse login(@RequestBody UserDTO userDTO, HttpServletResponse response) {
         try {
@@ -63,6 +87,18 @@ public class AccountController {
         }
     }
 
+    @Operation(summary = "토큰 재발급", description = "accessToken이 만료되었을때 Token 재발급을 위한 API, Cookie내 RefreshToken 필수")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "성공시 200코드 및 메세지 반환, Authorization Header -> accessToken / Cookie -> refreshToken 재발급",
+                    content = @Content(schema = @Schema(implementation = CommonResponse.class),
+                    examples = @ExampleObject(value = "{\n  \"statusCode\": \"200\",\n  \"message\": \"정상적으로 처리됨\",\n  \"data\": \"{}\"\n}"))),
+            @ApiResponse(responseCode = "500", description = "실패시 500코드 및 메세지 반환",
+                    content = @Content(schema = @Schema(implementation = CommonResponse.class),
+                    examples = @ExampleObject(value = "{\n  \"statusCode\": \"500\",\n  \"message\": \"Refresh Token의 유효기간이 만료됨\",\n  \"data\": \"{}\"\n}")))
+    })
+    @Parameters(value = {
+            @Parameter(name = "refresh", description = "쿠키내 RefreshToken", in = ParameterIn.COOKIE)
+    })
     @PostMapping("/reissue")
     public CommonResponse reissue(HttpServletRequest request, HttpServletResponse response) {
 

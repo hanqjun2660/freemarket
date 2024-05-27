@@ -3,7 +3,6 @@ package com.api.freemarket.config.swagger;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
-import io.swagger.v3.oas.models.servers.Server;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
@@ -27,7 +26,7 @@ public class SwaggerConfig implements WebMvcConfigurer {
         Info info = new Info()
                 .title("Freemarket API")
                 .version("1.0")
-                .description("2024 toy project Freemarket API");
+                .description("Freemarket API 문서");
 
         return new OpenAPI()
                 .components(new Components())

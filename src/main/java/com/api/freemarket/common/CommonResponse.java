@@ -1,8 +1,10 @@
 package com.api.freemarket.common;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import org.springframework.util.ObjectUtils;
 
+@Schema(description = "공통 응답 객체")
 @Getter
 public class CommonResponse<T> {
 

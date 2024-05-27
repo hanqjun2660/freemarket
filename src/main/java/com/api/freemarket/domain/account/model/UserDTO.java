@@ -1,5 +1,6 @@
 package com.api.freemarket.domain.account.model;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -9,6 +10,7 @@ import lombok.ToString;
 
 import java.util.Date;
 
+@Schema(description = "회원 정보 조회, 로그인, 수정용 DTO")
 @Setter
 @Getter
 @ToString
