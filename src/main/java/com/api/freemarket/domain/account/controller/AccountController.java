@@ -159,7 +159,7 @@ public class AccountController {
         String newAccessToken = jwtUtil.createToken("access", userNo, role, accessDuration);
         String newRefreshToken = jwtUtil.createToken("refresh", userNo, role, refreshDuration);
 
-        RedisData updateData = new RedisData(userNo, role, refreshToken);
+        RedisData updateData = new RedisData(userNo, role, newRefreshToken);
 
         redisService.setValues(String.valueOf(userNo), updateData, Duration.ofMillis(refreshDuration));
 
