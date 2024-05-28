@@ -161,7 +161,7 @@ public class AccountController {
 
         RedisData updateData = new RedisData(userNo, role, refreshToken);
 
-        redisService.setValues(String.valueOf(userNo), updateData, Duration.ofMillis(86400000L));
+        redisService.setValues(String.valueOf(userNo), updateData, Duration.ofMillis(refreshDuration));
 
         // 응답
         response.setHeader("Authorization", "Bearer " + newAccessToken);
