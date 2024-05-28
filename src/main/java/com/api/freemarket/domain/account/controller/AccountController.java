@@ -21,6 +21,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -42,6 +43,12 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @RequestMapping("/account")
 public class AccountController {
+
+    @Value("${spring.jwt.access-duration}")
+    private Long accessDuration;
+
+    @Value("${spring.jwt.refresh-duration}")
+    private Long refreshDuration;
 
     private final AuthenticationManager authenticationManager;
 
@@ -149,8 +156,8 @@ public class AccountController {
             return CommonResponse.ERROR("저장된 Token의 정보와 요청에 존재하는 Token의 정보가 다름");
         }
 
-        String newAccessToken = jwtUtil.createToken("access", userNo, role, 60000L);
-        String newRefreshToken = jwtUtil.createToken("refresh", userNo, role, 86400000L);
+        String newAccessToken = jwtUtil.createToken("access", userNo, role, accessDuration);
+        String newRefreshToken = jwtUtil.createToken("refresh", userNo, role, refreshDuration);
 
         RedisData updateData = new RedisData(userNo, role, refreshToken);
 
