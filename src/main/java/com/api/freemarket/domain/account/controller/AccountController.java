@@ -2,6 +2,8 @@ package com.api.freemarket.domain.account.controller;
 
 import com.api.freemarket.common.CommonResponse;
 import com.api.freemarket.common.jwt.JWTUtil;
+import com.api.freemarket.config.swagger.SwaggerAccountDesc;
+import com.api.freemarket.config.swagger.SwaggerCommonDesc;
 import com.api.freemarket.domain.account.entity.User;
 import com.api.freemarket.domain.account.enums.RoleName;
 import com.api.freemarket.domain.account.model.PrincipalDetails;
@@ -16,6 +18,7 @@ import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -31,7 +34,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.util.ObjectUtils;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.time.Duration;
 import java.util.Collection;
@@ -59,19 +64,16 @@ public class AccountController {
 
     private final UserService userService;
 
-    @Operation(summary = "로그인", description = "일반 회원의 로그인 API, memberId/password만 입력")
+    @Operation(summary = "로그인", description = SwaggerAccountDesc.NORMAL_USER_LOGIN_DESC)
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "성공시 200코드 반환",
+            @ApiResponse(responseCode = SwaggerCommonDesc.RESPONSE_SUCCESS_CODE, description = SwaggerAccountDesc.NORMAL_USER_LOGIN_SUCCESS_DESC,
                     content = @Content(schema = @Schema(implementation = CommonResponse.class),
-                    examples = @ExampleObject(value = "{\n  \"statusCode\": \"200\",\n  \"message\": \"\",\n  \"data\": \"{}\"\n}"))),
-            @ApiResponse(responseCode = "500", description = "실패시 500코드 및 메세지 반환",
+                    examples = @ExampleObject(value = SwaggerCommonDesc.RESPONSE_SUCCESS_DESC))),
+            @ApiResponse(responseCode = SwaggerCommonDesc.RESPONSE_FAILED_CODE, description = SwaggerAccountDesc.NORMAL_USER_LOGIN_FAILED_DESC,
                     content = @Content(schema = @Schema(implementation = CommonResponse.class),
-                    examples = @ExampleObject(value = "{\n  \"statusCode\": \"500\",\n  \"message\": \"아이디 혹은 패스워드가 잘못되었습니다.\",\n  \"data\": \"{}\"\n}")))
+                    examples = @ExampleObject(value = SwaggerCommonDesc.RESPONSE_FAILED_DESC)))
     })
-    @Parameters(value = {
-            @Parameter(name = "memberId", description = "일반 회원 ID"),
-            @Parameter(name = "password", description = "비밀번호")
-    })
+    @RequestBody(content = @Content(examples = {@ExampleObject(description = SwaggerAccountDesc.NORMAL_USER_LOGIN_EX_DESC, value = SwaggerAccountDesc.NORMAL_USER_LOGIN_EX_VAL)}))
     @PostMapping("/login")
     public CommonResponse login(@RequestBody UserDTO userDTO, HttpServletResponse response) {
         try {
@@ -97,17 +99,14 @@ public class AccountController {
         }
     }
 
-    @Operation(summary = "토큰 재발급", description = "accessToken이 만료되었을때 Token 재발급을 위한 API, Cookie내 RefreshToken 필수")
+    @Operation(summary = "토큰 재발급", description = SwaggerAccountDesc.TOKEN_REISSUE_DESC)
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "성공시 200코드 및 메세지 반환, Authorization Header -> accessToken / Cookie -> refreshToken 재발급",
+            @ApiResponse(responseCode = SwaggerCommonDesc.RESPONSE_SUCCESS_CODE, description = SwaggerAccountDesc.NORMAL_USER_LOGIN_SUCCESS_DESC,
                     content = @Content(schema = @Schema(implementation = CommonResponse.class),
-                    examples = @ExampleObject(value = "{\n  \"statusCode\": \"200\",\n  \"message\": \"정상적으로 처리됨\",\n  \"data\": \"{}\"\n}"))),
-            @ApiResponse(responseCode = "500", description = "실패시 500코드 및 메세지 반환",
+                            examples = @ExampleObject(value = SwaggerCommonDesc.RESPONSE_SUCCESS_DESC))),
+            @ApiResponse(responseCode = SwaggerCommonDesc.RESPONSE_FAILED_CODE, description = SwaggerAccountDesc.NORMAL_USER_LOGIN_FAILED_DESC,
                     content = @Content(schema = @Schema(implementation = CommonResponse.class),
-                    examples = @ExampleObject(value = "{\n  \"statusCode\": \"500\",\n  \"message\": \"Refresh Token의 유효기간이 만료됨\",\n  \"data\": \"{}\"\n}")))
-    })
-    @Parameters(value = {
-            @Parameter(name = "refresh", description = "쿠키내 RefreshToken", in = ParameterIn.COOKIE)
+                            examples = @ExampleObject(value = SwaggerCommonDesc.RESPONSE_FAILED_DESC)))
     })
     @PostMapping("/reissue")
     public CommonResponse reissue(HttpServletRequest request, HttpServletResponse response) {
@@ -173,19 +172,16 @@ public class AccountController {
         return CommonResponse.OK("정상적으로 처리됨");
     }
 
-    @Operation(summary = "추가 정보 입력(소셜 회원)", description = "소셜 회원 추가정보 입력(휴대폰 인증 선행 필수)")
+    @Operation(summary = "추가 정보 입력(소셜 회원)", description = SwaggerAccountDesc.ADD_INFO_DESC)
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "성공시 200코드 및 메세지 반환, Authorization Header -> accessToken / Cookie -> refreshToken",
+            @ApiResponse(responseCode = SwaggerCommonDesc.RESPONSE_SUCCESS_CODE, description = SwaggerAccountDesc.NORMAL_USER_LOGIN_SUCCESS_DESC,
                     content = @Content(schema = @Schema(implementation = CommonResponse.class),
-                            examples = @ExampleObject(value = "{\n  \"statusCode\": \"200\",\n  \"message\": \"정상적으로 처리됨\",\n  \"data\": \"{}\"\n}"))),
-            @ApiResponse(responseCode = "500", description = "실패시 500코드 및 메세지 반환",
+                            examples = @ExampleObject(value = SwaggerCommonDesc.RESPONSE_SUCCESS_DESC))),
+            @ApiResponse(responseCode = SwaggerCommonDesc.RESPONSE_FAILED_CODE, description = SwaggerAccountDesc.NORMAL_USER_LOGIN_FAILED_DESC,
                     content = @Content(schema = @Schema(implementation = CommonResponse.class),
-                            examples = @ExampleObject(value = "{\n  \"statusCode\": \"500\",\n  \"message\": \"해당 회원이 존재하지 않음\",\n  \"data\": \"{}\"\n}")))
+                            examples = @ExampleObject(value = SwaggerCommonDesc.RESPONSE_FAILED_DESC)))
     })
-    @Parameters(value = {
-            @Parameter(name = "memberNo", description = "쿠키내 memberNo", in = ParameterIn.COOKIE),
-            @Parameter(name = "phone", description = "휴대전화 번호", in = ParameterIn.PATH)
-    })
+    @RequestBody(content = @Content(examples = {@ExampleObject(description = SwaggerAccountDesc.ADD_INFO_EX_DESC, value = SwaggerAccountDesc.ADD_INFO_EX_VAL)}))
     @PostMapping("/add-info")
     public CommonResponse addInfo(@RequestBody UserDTO userDTO, HttpServletRequest request, HttpServletResponse response) {
         Cookie[] cookies = request.getCookies();
