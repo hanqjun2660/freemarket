@@ -40,6 +40,12 @@ public class RedisService {
         values.set(key, data, duration);
     }
 
+    // 이메일 인증번호 저장용
+    public void setValues(String key, String value, Duration duration) {
+        ValueOperations<String, Object> values = redisTemplate.opsForValue();
+        values.set(key, value, duration);
+    }
+
     // redis에 저장된 refreshToken 삭제
     public void deleteValues(String key) {
         redisTemplate.delete(key);
