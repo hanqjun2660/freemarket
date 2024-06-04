@@ -42,4 +42,17 @@ public class UserService implements UserDetailsService {
 
         return new PrincipalDetails(userDTO);
     }
+
+    public User insertByMemberNo(UserDTO userDTO, long memberNo) {
+        Optional<User> updateUser = Optional.ofNullable(userRepository.findByMemberNo(memberNo));
+
+        if(!updateUser.isPresent()) {
+            log.info("해당 회원이 존재하지 않음");
+            return new User();
+        }
+
+        updateUser.get().setPhone(userDTO.getPhone());
+
+        return userRepository.save(updateUser.get());
+    }
 }

@@ -2,15 +2,18 @@ package com.api.freemarket.domain.account.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.DynamicUpdate;
 
 import java.util.Date;
 
 @Entity
+@Setter
 @Getter
 @ToString
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@DynamicUpdate
 @Table(name = "member")
 public class User {
 
@@ -50,4 +53,14 @@ public class User {
 
     @Column(name = "member_id")
     private String memberId;
+
+    @Column(name = "regist_status")
+    private String registStatus;
+
+    @PrePersist
+    protected void onCreate() {
+        if(registStatus == null) {
+            registStatus = "N";
+        }
+    }
 }

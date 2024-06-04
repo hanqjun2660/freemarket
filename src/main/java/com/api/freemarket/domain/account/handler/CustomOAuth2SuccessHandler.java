@@ -2,6 +2,7 @@ package com.api.freemarket.domain.account.handler;
 
 import com.api.freemarket.domain.account.model.PrincipalDetails;
 import com.api.freemarket.domain.account.service.RedisService;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -25,16 +26,29 @@ public class CustomOAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHa
                                         Authentication authentication) {
 
         PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
+        Long userNo = principalDetails.getMemberNo();
 
-        Long memberNo = principalDetails.getMemberNo();
+        if("N".equals(principalDetails.getRegistStatus())) {
+            response.addCookie(createCookie("userNo", String.valueOf(userNo)));
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());        // 401 발생하면 추가정보(휴대폰) 받는 페이지로 이동 시켜야함.
+            return;
+        }
 
         Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
         Iterator<? extends GrantedAuthority> iterator = authorities.iterator();
         GrantedAuthority auth = iterator.next();
         String role = auth.getAuthority();
 
-        redisService.tokenWithInsertRedis(memberNo, role, response);
+        redisService.tokenWithInsertRedis(userNo, role, response);
 
         response.setStatus(HttpStatus.OK.value());
+    }
+
+    public Cookie createCookie(String key, String value) {
+        Cookie cookie = new Cookie(key, value);
+        cookie.setMaxAge(60*10);
+        cookie.setHttpOnly(true);
+
+        return cookie;
     }
 }

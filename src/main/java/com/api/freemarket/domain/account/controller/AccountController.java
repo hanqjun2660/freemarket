@@ -2,10 +2,13 @@ package com.api.freemarket.domain.account.controller;
 
 import com.api.freemarket.common.CommonResponse;
 import com.api.freemarket.common.jwt.JWTUtil;
+import com.api.freemarket.domain.account.entity.User;
+import com.api.freemarket.domain.account.enums.RoleName;
 import com.api.freemarket.domain.account.model.PrincipalDetails;
 import com.api.freemarket.domain.account.model.RedisData;
 import com.api.freemarket.domain.account.model.UserDTO;
 import com.api.freemarket.domain.account.service.RedisService;
+import com.api.freemarket.domain.account.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -27,10 +30,8 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.util.ObjectUtils;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.Duration;
 import java.util.Collection;
@@ -55,6 +56,8 @@ public class AccountController {
     private final JWTUtil jwtUtil;
 
     private final RedisService redisService;
+
+    private final UserService userService;
 
     @Operation(summary = "로그인", description = "일반 회원의 로그인 API, memberId/password만 입력")
     @ApiResponses(value = {
@@ -166,6 +169,47 @@ public class AccountController {
         // 응답
         response.setHeader("Authorization", "Bearer " + newAccessToken);
         response.addCookie(jwtUtil.createCookie("refresh", newRefreshToken));
+
+        return CommonResponse.OK("정상적으로 처리됨");
+    }
+
+    @Operation(summary = "추가 정보 입력(소셜 회원)", description = "소셜 회원 추가정보 입력(휴대폰 인증 선행 필수)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "성공시 200코드 및 메세지 반환, Authorization Header -> accessToken / Cookie -> refreshToken",
+                    content = @Content(schema = @Schema(implementation = CommonResponse.class),
+                            examples = @ExampleObject(value = "{\n  \"statusCode\": \"200\",\n  \"message\": \"정상적으로 처리됨\",\n  \"data\": \"{}\"\n}"))),
+            @ApiResponse(responseCode = "500", description = "실패시 500코드 및 메세지 반환",
+                    content = @Content(schema = @Schema(implementation = CommonResponse.class),
+                            examples = @ExampleObject(value = "{\n  \"statusCode\": \"500\",\n  \"message\": \"해당 회원이 존재하지 않음\",\n  \"data\": \"{}\"\n}")))
+    })
+    @Parameters(value = {
+            @Parameter(name = "memberNo", description = "쿠키내 memberNo", in = ParameterIn.COOKIE),
+            @Parameter(name = "phone", description = "휴대전화 번호", in = ParameterIn.PATH)
+    })
+    @PostMapping("/add-info")
+    public CommonResponse addInfo(@RequestBody UserDTO userDTO, HttpServletRequest request, HttpServletResponse response) {
+        Cookie[] cookies = request.getCookies();
+        long memberNo = 0L;
+
+        try {
+            for(Cookie cookie : cookies) {
+                if("memberNo".equals(cookie.getName())) {
+                    memberNo = Long.parseLong(cookie.getValue());
+                }
+            }
+        } catch (NullPointerException e) {
+            CommonResponse.ERROR("Cookie가 존재하지 않음");
+        }
+
+        User updateUser = userService.insertByMemberNo(userDTO, memberNo);
+
+        if(ObjectUtils.isEmpty(updateUser)) {
+            return CommonResponse.ERROR("해당 회원이 존재하지 않음");
+        }
+
+        String role = String.valueOf(RoleName.ROLE_USER);
+
+        redisService.tokenWithInsertRedis(memberNo, role, response);
 
         return CommonResponse.OK("정상적으로 처리됨");
     }
