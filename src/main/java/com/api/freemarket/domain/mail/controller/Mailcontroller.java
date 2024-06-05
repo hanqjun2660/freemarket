@@ -18,7 +18,7 @@ import java.security.SecureRandom;
 import java.time.Duration;
 import java.util.Random;
 
-@Tag(name="Account", description = "계정 관련 API")
+@Tag(name="Mail", description = "인증 번호 메일발송 및 검증")
 @RestController
 @Slf4j
 @RequiredArgsConstructor
@@ -35,7 +35,7 @@ public class Mailcontroller {
     @PostMapping("/send")
     public CommonResponse sendCodeToEmail(@RequestBody MailDTO mailDTO) {
         String title = "[인증번호] FreeMarket 이메일 인증번호 입니다.";
-        String origincode = createcode();
+        String origincode = createCode();
         String authCode = "인증번호 : " + origincode;
 
         mailService.sendEmail(mailDTO.getToEmail(), title, authCode);
@@ -43,13 +43,13 @@ public class Mailcontroller {
         try {
             redisService.setValues(mailDTO.getToEmail(), origincode, Duration.ofMillis(authCodeExpireationMillis));
         } catch (Exception e) {
-            log.info("mail controller exception2");
+            log.info("mail controller exception");
             e.printStackTrace();
         }
         return CommonResponse.OK("메일 발송 성공");
     }
 
-    private String createcode() {
+    private String createCode() {
         int length = 8;
         try {
             Random random = SecureRandom.getInstanceStrong();
