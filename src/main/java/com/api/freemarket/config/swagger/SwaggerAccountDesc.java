@@ -25,7 +25,30 @@ public final class SwaggerAccountDesc {
                 "phone":"01022772660"
             }
             """;
+
+    // 회원가입
+    public static final String JOIN_DESC = "회원가입 API";
+    public static final String JOIN_SUCCESS_DESC = "성공시 200코드 반환";
+    public static final String JOIN_FAILED_DESC = "실패시 500코드 반환";
+    public static final String JOIN_EX_DESC = "아이디,비밀번호,이름,별명,이메일 JSON으로 전달";
+    public static final String JOIN_EX_VAL = """
+            {
+                "memberId":"회원 아이디",
+                "password":"비밀번호",
+                "name":"이름",
+                "nickname":"별명",
+                "email":"abcd@gmail.com"
+            }
+            """;
+
+    // 별명 중복 체크
+    public static final String CHECK_NICKNAME_DESC = "별명 중복 체크 API";
+    public static final String CHECK_NICKNAME_SUCCESS_DESC = "성공시 200코드 반환";
+    public static final String CHECK_NICKNAME_FAILED_DESC = "실패시 500코드 반환";
+    public static final String CHECK_NICKNAME_EX_DESC = "별명 JSON으로 전달";
+    public static final String CHECK_NICKNAME_EX_VAL = """
+            {
+                "nickname":"별명"
+            }
+            """;
 }
-
-
-;

@@ -24,6 +24,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -44,7 +45,7 @@ import java.util.Optional;
 @RestController
 @Slf4j
 @RequiredArgsConstructor
-@RequestMapping("/account")
+@RequestMapping("/api/v1/account")
 public class AccountController {
 
     @Value("${spring.jwt.access-duration}")
@@ -206,4 +207,64 @@ public class AccountController {
 
         return CommonResponse.OK("정상적으로 처리됨");
     }
+
+    @Operation(summary = "회원가입", description = SwaggerAccountDesc.JOIN_DESC)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = SwaggerCommonDesc.RESPONSE_SUCCESS_CODE, description = SwaggerAccountDesc.JOIN_SUCCESS_DESC,
+                    content = @Content(schema = @Schema(implementation = CommonResponse.class),
+                            examples = @ExampleObject(value = SwaggerCommonDesc.RESPONSE_SUCCESS_DESC))),
+            @ApiResponse(responseCode = SwaggerCommonDesc.RESPONSE_FAILED_CODE, description = SwaggerAccountDesc.JOIN_FAILED_DESC,
+                    content = @Content(schema = @Schema(implementation = CommonResponse.class),
+                            examples = @ExampleObject(value = SwaggerCommonDesc.RESPONSE_FAILED_DESC)))
+    })
+    @RequestBody(content = @Content(examples = {@ExampleObject(description = SwaggerAccountDesc.JOIN_EX_DESC, value = SwaggerAccountDesc.JOIN_EX_VAL)}))
+    @PostMapping("/join")
+    public CommonResponse join(@RequestBody UserDTO userDTO, HttpServletResponse response) {
+
+        // 클라이언트가 꼭 보내야만 하는 값
+        // userDTO.memberId. password, name, nickname, email
+        if(StringUtils.isEmpty(userDTO.getMemberId()) ||
+                StringUtils.isEmpty(userDTO.getPassword()) ||
+                StringUtils.isEmpty(userDTO.getName()) ||
+                StringUtils.isEmpty(userDTO.getNickname()) ||
+                StringUtils.isEmpty(userDTO.getEmail())) {
+
+            return CommonResponse.ERROR("회원가입 내용을 모두 입력해주세요.");
+        }
+
+        // 사용자 정보 DB 저장
+        User joinUser = userService.joinUser(userDTO);
+
+        return CommonResponse.OK(null);
+    }
+
+    @Operation(summary = "별명 중복 체크", description = SwaggerAccountDesc.CHECK_NICKNAME_DESC)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = SwaggerCommonDesc.RESPONSE_SUCCESS_CODE, description = SwaggerAccountDesc.CHECK_NICKNAME_SUCCESS_DESC,
+                    content = @Content(schema = @Schema(implementation = CommonResponse.class),
+                            examples = @ExampleObject(value = SwaggerCommonDesc.RESPONSE_SUCCESS_DESC))),
+            @ApiResponse(responseCode = SwaggerCommonDesc.RESPONSE_FAILED_CODE, description = SwaggerAccountDesc.CHECK_NICKNAME_FAILED_DESC,
+                    content = @Content(schema = @Schema(implementation = CommonResponse.class),
+                            examples = @ExampleObject(value = SwaggerCommonDesc.RESPONSE_FAILED_DESC)))
+    })
+    @RequestBody(content = @Content(examples = {@ExampleObject(description = SwaggerAccountDesc.CHECK_NICKNAME_EX_DESC, value = SwaggerAccountDesc.CHECK_NICKNAME_EX_VAL)}))
+    @PostMapping("/check-nickname")
+    public CommonResponse checkNickname(@RequestBody UserDTO userDTO, HttpServletResponse response) {
+
+        // 값이 넘어왔는지 체크
+        if(StringUtils.isEmpty(userDTO.getNickname())) {
+            return CommonResponse.ERROR("별명을 입력해주세요.");
+        }
+
+        boolean exists = userService.existsByNickname(userDTO.getNickname());
+        if(exists) {
+            return CommonResponse.OK("해당 별명을 사용하는 사용자가 존재합니다.", exists);
+        } else {
+            return CommonResponse.OK("사용 가능한 별명입니다.", exists);
+        }
+
+
+    }
+
+
 }

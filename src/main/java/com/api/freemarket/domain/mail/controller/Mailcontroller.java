@@ -30,7 +30,7 @@ import java.util.Random;
 @RestController
 @Slf4j
 @RequiredArgsConstructor
-@RequestMapping("/mail")
+@RequestMapping("/api/v1/mail")
 public class Mailcontroller {
 
     private final RedisService redisService;

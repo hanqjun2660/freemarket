@@ -4,15 +4,15 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 import java.util.Date;
 
 @Schema(description = "회원 정보 조회, 로그인, 수정용 DTO")
-@Setter
 @Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 @ToString
 public class UserDTO {
 

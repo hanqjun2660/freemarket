@@ -55,4 +55,12 @@ public class UserService implements UserDetailsService {
 
         return userRepository.save(updateUser.get());
     }
+
+    public User joinUser(UserDTO userDTO) {
+        return userRepository.save(modelMapper.map(userDTO, User.class));
+    }
+
+    public boolean existsByNickname(String nickname) {
+        return userRepository.existsByNickname(nickname);
+    }
 }
