@@ -28,7 +28,7 @@ spring:
             client-name: kakao
             client-id: 5397e5b5bfb8d92a4bdc0636634328ba
             client-secret: FviuK7zk0KQz9lsEUv54kcb3tSbbfUsM
-            redirect-uri: https://freeapi.devsj.site/api/v1/namespaces/default/services/http:freeappser:4544/proxy/login/oauth2/code/kakao
+            redirect-uri: https://freeapi.devsj.site/login/oauth2/code/kakao
             authorization-grant-type: authorization_code
             scope: profile_nickname,profile_image,account_email
             client-authentication-method: client_secret_post
