@@ -1,15 +1,23 @@
 package com.api.freemarket.domain.mail.controller;
 
 import com.api.freemarket.common.CommonResponse;
+import com.api.freemarket.config.swagger.SwaggerCommonDesc;
+import com.api.freemarket.config.swagger.SwaggerMailDesc;
 import com.api.freemarket.domain.account.service.RedisService;
 import com.api.freemarket.domain.mail.model.MailDTO;
 import com.api.freemarket.domain.mail.service.MailService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -32,6 +40,16 @@ public class Mailcontroller {
     @Value("${spring.mail.auth-code-expiration-millis}")
     private long authCodeExpireationMillis;
 
+    @Operation(summary = "인증번호 메일 발송", description = "회원 인증용 메일발송 api")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = SwaggerCommonDesc.RESPONSE_SUCCESS_CODE, description = SwaggerMailDesc.SEND_MAIL_SUCCESS_DESC,
+                    content = @Content(schema = @Schema(implementation = CommonResponse.class),
+                            examples = @ExampleObject(value = SwaggerCommonDesc.RESPONSE_SUCCESS_DESC))),
+            @ApiResponse(responseCode = SwaggerCommonDesc.RESPONSE_FAILED_CODE, description = SwaggerMailDesc.SEND_MAIL_FAILED_DESC,
+                    content = @Content(schema = @Schema(implementation = CommonResponse.class),
+                            examples = @ExampleObject(value = SwaggerCommonDesc.RESPONSE_FAILED_DESC)))
+    })
+    @RequestBody(content = @Content(examples = {@ExampleObject(description = SwaggerMailDesc.SEND_MAIL_EX_DESC, value = SwaggerMailDesc.SEND_MAIL_EX_VAL)}))
     @PostMapping("/send")
     public CommonResponse sendCodeToEmail(@RequestBody MailDTO mailDTO) {
         String title = "[인증번호] FreeMarket 이메일 인증번호 입니다.";
