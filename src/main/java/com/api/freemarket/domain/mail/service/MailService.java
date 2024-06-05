@@ -23,6 +23,7 @@ public class MailService {
             emailSender.send(emailForm);
         } catch (RuntimeException e) {
             e.printStackTrace();
+            log.info("mail service exception");
             throw new RuntimeException(e);
         }
     }
