@@ -86,7 +86,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfiguration() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOriginPatterns(Arrays.asList("https://*.devsj.site"));        // front 서버 주소 나오면 수정해야함
+        configuration.setAllowedOriginPatterns(Arrays.asList("*"));        // front 서버 주소 나오면 수정해야함
         configuration.setAllowCredentials(true);
         configuration.setAllowedHeaders(Arrays.asList("*"));        // 알맞게 수정해야함
         configuration.setAllowedMethods(Arrays.asList("*"));        // 알맞게 수정해야함
