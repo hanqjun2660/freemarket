@@ -37,10 +37,15 @@ public class Mailcontroller {
         String title = "[인증번호] FreeMarket 이메일 인증번호 입니다.";
         String origincode = createcode();
         String authCode = "인증번호 : " + origincode;
+
         mailService.sendEmail(mailDTO.getToEmail(), title, authCode);
-        log.info("mail controller exception1");
-        redisService.setValues(mailDTO.getToEmail(), origincode, Duration.ofMillis(authCodeExpireationMillis));
-        log.info("mail controller exception2");
+
+        try {
+            redisService.setValues(mailDTO.getToEmail(), origincode, Duration.ofMillis(authCodeExpireationMillis));
+        } catch (RuntimeException e) {
+            log.info("mail controller exception2");
+            e.printStackTrace();
+        }
         return CommonResponse.OK("메일 발송 성공");
     }
 
