@@ -42,7 +42,7 @@ public class Mailcontroller {
 
         try {
             redisService.setValues(mailDTO.getToEmail(), origincode, Duration.ofMillis(authCodeExpireationMillis));
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             log.info("mail controller exception2");
             e.printStackTrace();
         }
