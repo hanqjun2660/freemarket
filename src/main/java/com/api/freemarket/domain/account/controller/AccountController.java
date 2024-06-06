@@ -15,7 +15,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -33,6 +32,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -71,7 +71,7 @@ public class AccountController {
                     content = @Content(schema = @Schema(implementation = CommonResponse.class),
                     examples = @ExampleObject(value = SwaggerCommonDesc.RESPONSE_FAILED_DESC)))
     })
-    @RequestBody(content = @Content(examples = {@ExampleObject(description = SwaggerAccountDesc.NORMAL_USER_LOGIN_EX_DESC, value = SwaggerAccountDesc.NORMAL_USER_LOGIN_EX_VAL)}))
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(examples = {@ExampleObject(description = SwaggerAccountDesc.NORMAL_USER_LOGIN_EX_DESC, value = SwaggerAccountDesc.NORMAL_USER_LOGIN_EX_VAL)}))
     @PostMapping("/login")
     public CommonResponse login(@RequestBody UserDTO userDTO, HttpServletResponse response) {
         try {
@@ -179,7 +179,7 @@ public class AccountController {
                     content = @Content(schema = @Schema(implementation = CommonResponse.class),
                             examples = @ExampleObject(value = SwaggerCommonDesc.RESPONSE_FAILED_DESC)))
     })
-    @RequestBody(content = @Content(examples = {@ExampleObject(description = SwaggerAccountDesc.ADD_INFO_EX_DESC, value = SwaggerAccountDesc.ADD_INFO_EX_VAL)}))
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(examples = {@ExampleObject(description = SwaggerAccountDesc.ADD_INFO_EX_DESC, value = SwaggerAccountDesc.ADD_INFO_EX_VAL)}))
     @PostMapping("/add-info")
     public CommonResponse addInfo(@RequestBody UserDTO userDTO, HttpServletRequest request, HttpServletResponse response) {
         Cookie[] cookies = request.getCookies();
@@ -217,9 +217,9 @@ public class AccountController {
                     content = @Content(schema = @Schema(implementation = CommonResponse.class),
                             examples = @ExampleObject(value = SwaggerCommonDesc.RESPONSE_FAILED_DESC)))
     })
-    @RequestBody(content = @Content(examples = {@ExampleObject(description = SwaggerAccountDesc.JOIN_EX_DESC, value = SwaggerAccountDesc.JOIN_EX_VAL)}))
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(examples = {@ExampleObject(description = SwaggerAccountDesc.JOIN_EX_DESC, value = SwaggerAccountDesc.JOIN_EX_VAL)}))
     @PostMapping("/join")
-    public CommonResponse join(@RequestBody UserDTO userDTO, HttpServletResponse response) {
+    public CommonResponse join(@RequestBody UserDTO userDTO) {
 
         // 클라이언트가 꼭 보내야만 하는 값
         // userDTO.memberId. password, name, nickname, email
@@ -247,9 +247,9 @@ public class AccountController {
                     content = @Content(schema = @Schema(implementation = CommonResponse.class),
                             examples = @ExampleObject(value = SwaggerCommonDesc.RESPONSE_FAILED_DESC)))
     })
-    @RequestBody(content = @Content(examples = {@ExampleObject(description = SwaggerAccountDesc.CHECK_NICKNAME_EX_DESC, value = SwaggerAccountDesc.CHECK_NICKNAME_EX_VAL)}))
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(examples = {@ExampleObject(description = SwaggerAccountDesc.CHECK_NICKNAME_EX_DESC, value = SwaggerAccountDesc.CHECK_NICKNAME_EX_VAL)}))
     @PostMapping("/check-nickname")
-    public CommonResponse checkNickname(@RequestBody UserDTO userDTO, HttpServletResponse response) {
+    public CommonResponse checkNickname(@RequestBody UserDTO userDTO) {
 
         // 값이 넘어왔는지 체크
         if(StringUtils.isEmpty(userDTO.getNickname())) {
