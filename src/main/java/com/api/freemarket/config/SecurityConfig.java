@@ -74,6 +74,7 @@ public class SecurityConfig {
         http.authorizeHttpRequests((auth) -> auth
                 .requestMatchers("/logout").authenticated()
                 .requestMatchers("/api/v1/account/**").permitAll()
+                .requestMatchers("/api/v1/mail/**").permitAll()
                 .anyRequest().permitAll());
 
         // Session
@@ -121,7 +122,7 @@ public class SecurityConfig {
                 "/swagger-*.yaml",
                 "/v3/api-docs/**",
                 "/error",
-                "/mail/**"
+                "/api/v1/mail/**"
         );
     }
 }
