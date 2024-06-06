@@ -34,7 +34,7 @@ public enum ErrorCode {
     BAD_GATEWAY(HttpStatus.BAD_GATEWAY, "잘못된 게이트웨이 응답입니다"),
 
     /* 503 SERVICE_UNAVAILABLE : 서버 과부화 등 일시적 서비스 제공 불가 상태 */
-    SERVICE_UNAVAILABLE(HttpStatus.SERVICE_UNAVAILABLE, "서비스를 사용할 수 없습니다"),
+    SERVICE_UNAVAILABLE(HttpStatus.SERVICE_UNAVAILABLE, "서비스를 사용할 수 없습니다")
     ;
 
     private final HttpStatus httpStatus;

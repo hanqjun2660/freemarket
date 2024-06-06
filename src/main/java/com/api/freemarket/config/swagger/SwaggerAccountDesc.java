@@ -18,7 +18,7 @@ public final class SwaggerAccountDesc {
     public static final String TOKEN_REISSUE_DESC = "accessToken이 만료되었을때 Token 재발급을 위한 API, Cookie내 RefreshToken 필수";
 
     // 추가 정보 입력
-    public static final String ADD_INFO_DESC = "소셜 회원 추가정보 입력(휴대폰 인증 선행 필수), memberNo 쿠키내 수동으로 추가해야함";
+    public static final String ADD_INFO_DESC = "소셜 회원 추가정보 입력(휴대폰 인증 선행 필수), 테스트시 memberNo 쿠키 내 수동으로 추가해야함";
     public static final String ADD_INFO_EX_DESC = "휴대폰 번호만 json으로 전달(쿠키내 meberNo 존재해야함. 테스트시 수동으로 넣을것)";
     public static final String ADD_INFO_EX_VAL = """
             {

@@ -1,6 +1,7 @@
 package com.api.freemarket.common.excption;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.BindException;
 import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -8,8 +9,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 import java.io.FileNotFoundException;
 
-import static com.api.freemarket.common.excption.ErrorCode.DATA_NOT_FOUND;
-import static com.api.freemarket.common.excption.ErrorCode.INTERNAL_SERVER_ERROR;
+import static com.api.freemarket.common.excption.ErrorCode.*;
 
 @RestControllerAdvice
 @Slf4j

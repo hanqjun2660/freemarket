@@ -62,6 +62,10 @@ public class RedisService {
         return jsonValue;
     }
 
+    public String getValuesForString(String key) {
+        return (String) redisTemplate.opsForValue().get(key);
+    }
+
     public boolean checkExistsValue(String value) {
         return value.equals("false");
     }

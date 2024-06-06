@@ -1,6 +1,5 @@
 package com.api.freemarket.domain.account.model;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
