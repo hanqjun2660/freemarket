@@ -122,7 +122,8 @@ public class SecurityConfig {
                 "/swagger-*.yaml",
                 "/v3/api-docs/**",
                 "/error",
-                "/api/v1/mail/**"
+                "/api/v1/mail/**",
+                "/api/v1/account/login"
         );
     }
 }

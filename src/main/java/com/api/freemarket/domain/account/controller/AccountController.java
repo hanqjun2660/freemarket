@@ -22,7 +22,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -78,8 +77,6 @@ public class AccountController {
     @PostMapping("/login")
     public CommonResponse login(@RequestBody @Validated({ValidationGroups.loginValidation.class}) UserDTO userDTO, HttpServletResponse response) {
         try {
-
-
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(userDTO.getMemberId(), userDTO.getPassword())
             );
@@ -186,7 +183,7 @@ public class AccountController {
     })
     @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(examples = {@ExampleObject(description = SwaggerAccountDesc.ADD_INFO_EX_DESC, value = SwaggerAccountDesc.ADD_INFO_EX_VAL)}))
     @PostMapping("/add-info")
-    public CommonResponse addInfo(@RequestBody UserDTO userDTO, HttpServletRequest request, HttpServletResponse response) {
+    public CommonResponse addInfo(@RequestBody @Validated({ValidationGroups.addInfoValidation.class}) UserDTO userDTO, HttpServletRequest request, HttpServletResponse response) {
         Cookie[] cookies = request.getCookies();
         long memberNo = 0L;
 
@@ -279,9 +276,5 @@ public class AccountController {
         } else {
             return CommonResponse.OK("사용 가능한 아이디입니다.", !exists);
         }
-
-
     }
-
-
 }

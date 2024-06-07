@@ -6,5 +6,6 @@ public class ValidationGroups {
     public interface NicknameValidation {}
     public interface joinValidation {}
     public interface loginValidation {}
+    public interface addInfoValidation {}
 
 }
