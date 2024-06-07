@@ -31,7 +31,7 @@ public class UserDTO {
 
     private String profileImg;
 
-    @NotBlank(message = "핸드폰 번호는 필수 항목 입니다.", groups = {ValidationGroups.addInfoValidation.class})
+    @NotBlank(message = "핸드폰 번호는 필수 항목 입니다.", groups = {ValidationGroups.addInfoValidation.class, ValidationGroups.joinValidation.class})
     private String phone;
 
     private String provider;
