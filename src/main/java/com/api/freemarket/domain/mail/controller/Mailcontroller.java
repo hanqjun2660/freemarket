@@ -4,7 +4,7 @@ import com.api.freemarket.common.CommonResponse;
 import com.api.freemarket.config.swagger.SwaggerCommonDesc;
 import com.api.freemarket.config.swagger.SwaggerMailDesc;
 import com.api.freemarket.domain.account.service.RedisService;
-import com.api.freemarket.domain.mail.model.MailDTO;
+import com.api.freemarket.domain.mail.model.CertNumberSendRequest;
 import com.api.freemarket.domain.mail.model.VaildCertNumberRequest;
 import com.api.freemarket.domain.mail.service.MailService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -53,15 +53,15 @@ public class Mailcontroller {
     })
     @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(examples = {@ExampleObject(description = SwaggerMailDesc.SEND_MAIL_EX_DESC, value = SwaggerMailDesc.SEND_MAIL_EX_VAL)}))
     @PostMapping("/send")
-    public CommonResponse sendCodeToEmail(@RequestBody @Valid MailDTO mailDTO) {
+    public CommonResponse sendCodeToEmail(@RequestBody @Valid CertNumberSendRequest certNumberSendRequest) {
         String title = "[인증번호] FreeMarket 이메일 인증번호 입니다.";
         String origincode = createCode();
         String authCode = "인증번호 : " + origincode;
 
-        mailService.sendEmail(mailDTO.getToEmail(), title, authCode);
+        mailService.sendEmail(certNumberSendRequest.getToEmail(), title, authCode);
 
         try {
-            redisService.setValues(mailDTO.getToEmail(), origincode, Duration.ofMillis(authCodeExpireationMillis));
+            redisService.setValues(certNumberSendRequest.getToEmail(), origincode, Duration.ofMillis(authCodeExpireationMillis));
         } catch (Exception e) {
             log.info("mail controller exception");
             e.printStackTrace();
