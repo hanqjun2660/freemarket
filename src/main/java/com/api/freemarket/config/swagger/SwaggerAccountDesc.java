@@ -37,6 +37,7 @@ public final class SwaggerAccountDesc {
                 "password":"비밀번호",
                 "name":"이름",
                 "nickname":"별명",
+                "phone":"01012345678",
                 "email":"abcd@gmail.com"
             }
             """;
