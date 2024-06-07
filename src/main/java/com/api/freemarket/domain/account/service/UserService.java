@@ -63,4 +63,8 @@ public class UserService implements UserDetailsService {
     public boolean existsByNickname(String nickname) {
         return userRepository.existsByNickname(nickname);
     }
+
+    public boolean existsByMemberId(String memberId) {
+        return userRepository.existsByMemberId(memberId);
+    }
 }

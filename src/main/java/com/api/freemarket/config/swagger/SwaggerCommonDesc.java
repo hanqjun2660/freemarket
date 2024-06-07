@@ -6,4 +6,7 @@ public final class SwaggerCommonDesc {
     public static final String RESPONSE_SUCCESS_DESC = "{\n  \"statusCode\": \"200\",\n  \"message\": \"성공 메세지\",\n  \"data\": \"{}\"\n}";
     public static final String RESPONSE_FAILED_CODE = "500";
     public static final String RESPONSE_FAILED_DESC = "{\n  \"statusCode\": \"500\",\n  \"message\": \"실패 메세지\",\n  \"data\": \"{}\"\n}";
+
+    public static final String RESPONSE_SUCCESS_DESC_DATA_TRUE = "{\n  \"statusCode\": \"200\",\n  \"message\": \"성공 메세지\",\n  \"data\": \"true\"\n}";
+    public static final String RESPONSE_FAILED_DESC_DATA_FALSE = "{\n  \"statusCode\": \"500\",\n  \"message\": \"실패 메세지\",\n  \"data\": \"false\"\n}";
 }

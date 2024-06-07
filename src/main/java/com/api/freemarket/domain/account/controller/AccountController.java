@@ -2,6 +2,7 @@ package com.api.freemarket.domain.account.controller;
 
 import com.api.freemarket.common.CommonResponse;
 import com.api.freemarket.common.jwt.JWTUtil;
+import com.api.freemarket.common.validation.ValidationGroups;
 import com.api.freemarket.config.swagger.SwaggerAccountDesc;
 import com.api.freemarket.config.swagger.SwaggerCommonDesc;
 import com.api.freemarket.domain.account.entity.User;
@@ -21,6 +22,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -31,6 +33,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.util.ObjectUtils;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -73,8 +76,10 @@ public class AccountController {
     })
     @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(examples = {@ExampleObject(description = SwaggerAccountDesc.NORMAL_USER_LOGIN_EX_DESC, value = SwaggerAccountDesc.NORMAL_USER_LOGIN_EX_VAL)}))
     @PostMapping("/login")
-    public CommonResponse login(@RequestBody UserDTO userDTO, HttpServletResponse response) {
+    public CommonResponse login(@RequestBody @Validated({ValidationGroups.loginValidation.class}) UserDTO userDTO, HttpServletResponse response) {
         try {
+
+
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(userDTO.getMemberId(), userDTO.getPassword())
             );
@@ -219,21 +224,10 @@ public class AccountController {
     })
     @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(examples = {@ExampleObject(description = SwaggerAccountDesc.JOIN_EX_DESC, value = SwaggerAccountDesc.JOIN_EX_VAL)}))
     @PostMapping("/join")
-    public CommonResponse join(@RequestBody UserDTO userDTO) {
-
-        // 클라이언트가 꼭 보내야만 하는 값
-        // userDTO.memberId. password, name, nickname, email
-        if(StringUtils.isEmpty(userDTO.getMemberId()) ||
-                StringUtils.isEmpty(userDTO.getPassword()) ||
-                StringUtils.isEmpty(userDTO.getName()) ||
-                StringUtils.isEmpty(userDTO.getNickname()) ||
-                StringUtils.isEmpty(userDTO.getEmail())) {
-
-            return CommonResponse.ERROR("회원가입 내용을 모두 입력해주세요.");
-        }
+    public CommonResponse join(@RequestBody @Validated({ValidationGroups.joinValidation.class}) UserDTO UserDTO) {
 
         // 사용자 정보 DB 저장
-        User joinUser = userService.joinUser(userDTO);
+        User joinUser = userService.joinUser(UserDTO);
 
         return CommonResponse.OK(null);
     }
@@ -242,25 +236,48 @@ public class AccountController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = SwaggerCommonDesc.RESPONSE_SUCCESS_CODE, description = SwaggerAccountDesc.CHECK_NICKNAME_SUCCESS_DESC,
                     content = @Content(schema = @Schema(implementation = CommonResponse.class),
-                            examples = @ExampleObject(value = SwaggerCommonDesc.RESPONSE_SUCCESS_DESC))),
+                            examples = @ExampleObject(value = SwaggerCommonDesc.RESPONSE_SUCCESS_DESC_DATA_TRUE))),
             @ApiResponse(responseCode = SwaggerCommonDesc.RESPONSE_FAILED_CODE, description = SwaggerAccountDesc.CHECK_NICKNAME_FAILED_DESC,
                     content = @Content(schema = @Schema(implementation = CommonResponse.class),
-                            examples = @ExampleObject(value = SwaggerCommonDesc.RESPONSE_FAILED_DESC)))
+                            examples = @ExampleObject(value = SwaggerCommonDesc.RESPONSE_FAILED_DESC_DATA_FALSE)))
     })
     @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(examples = {@ExampleObject(description = SwaggerAccountDesc.CHECK_NICKNAME_EX_DESC, value = SwaggerAccountDesc.CHECK_NICKNAME_EX_VAL)}))
     @PostMapping("/check-nickname")
-    public CommonResponse checkNickname(@RequestBody UserDTO userDTO) {
-
-        // 값이 넘어왔는지 체크
-        if(StringUtils.isEmpty(userDTO.getNickname())) {
-            return CommonResponse.ERROR("별명을 입력해주세요.");
-        }
+    public CommonResponse checkNickname(@RequestBody @Validated({ValidationGroups.NicknameValidation.class}) UserDTO userDTO) {
 
         boolean exists = userService.existsByNickname(userDTO.getNickname());
         if(exists) {
-            return CommonResponse.OK("해당 별명을 사용하는 사용자가 존재합니다.", exists);
+            return CommonResponse.ERROR("해당 별명을 사용하는 사용자가 존재합니다.", !exists);
         } else {
-            return CommonResponse.OK("사용 가능한 별명입니다.", exists);
+            return CommonResponse.OK("사용 가능한 별명입니다.", !exists);
+        }
+
+
+    }
+
+    @Operation(summary = "아이디 중복 체크", description = SwaggerAccountDesc.MEMBER_ID_DESC)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = SwaggerCommonDesc.RESPONSE_SUCCESS_CODE, description = SwaggerAccountDesc.MEMBER_ID_SUCCESS_DESC,
+                    content = @Content(schema = @Schema(implementation = CommonResponse.class),
+                            examples = @ExampleObject(value = SwaggerCommonDesc.RESPONSE_SUCCESS_DESC_DATA_TRUE))),
+            @ApiResponse(responseCode = SwaggerCommonDesc.RESPONSE_FAILED_CODE, description = SwaggerAccountDesc.MEMBER_ID_FAILED_DESC,
+                    content = @Content(schema = @Schema(implementation = CommonResponse.class),
+                            examples = @ExampleObject(value = SwaggerCommonDesc.RESPONSE_FAILED_DESC_DATA_FALSE)))
+    })
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(examples = {@ExampleObject(description = SwaggerAccountDesc.MEMBER_ID_EX_DESC, value = SwaggerAccountDesc.MEMBER_ID_EX_VAL)}))
+    @PostMapping("/check-id")
+    public CommonResponse checkId(@RequestBody @Validated({ValidationGroups.memberIdValidation.class}) UserDTO userDTO) {
+
+        // 값이 넘어왔는지 체크
+        if(StringUtils.isEmpty(userDTO.getMemberId())) {
+            return CommonResponse.ERROR("별명을 입력해주세요.");
+        }
+
+        boolean exists = userService.existsByMemberId(userDTO.getMemberId());
+        if(exists) {
+            return CommonResponse.ERROR("해당 아이디를 사용하는 사용자가 존재합니다.", !exists);
+        } else {
+            return CommonResponse.OK("사용 가능한 아이디입니다.", !exists);
         }
 
 

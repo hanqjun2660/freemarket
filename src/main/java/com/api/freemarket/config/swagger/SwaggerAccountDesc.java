@@ -51,4 +51,15 @@ public final class SwaggerAccountDesc {
                 "nickname":"별명"
             }
             """;
+
+    // 아이디 중복 체크
+    public static final String MEMBER_ID_DESC = "아이디 중복 체크 API";
+    public static final String MEMBER_ID_SUCCESS_DESC = "성공시 200코드 반환";
+    public static final String MEMBER_ID_FAILED_DESC = "실패시 500코드 반환";
+    public static final String MEMBER_ID_EX_DESC = "아이디 JSON으로 전달";
+    public static final String MEMBER_ID_EX_VAL = """
+            {
+                "memberId":"아이디"
+            }
+            """;
 }
