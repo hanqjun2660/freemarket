@@ -51,6 +51,4 @@ public class UserDTO {
     private String memberId;
 
     private String role;
-
-    private String registStatus;
 }

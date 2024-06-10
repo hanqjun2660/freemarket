@@ -1,9 +1,12 @@
 package com.api.freemarket.common.excption;
 
+import com.api.freemarket.common.CommonResponse;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.ErrorResponse;
+
+import java.util.Map;
 
 @Getter
 @RequiredArgsConstructor
@@ -20,6 +23,7 @@ public enum ErrorCode {
     MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 유저 정보를 찾을 수 없습니다"),
     REFRESH_TOKEN_NOT_FOUND(HttpStatus.NOT_FOUND, "로그아웃 된 사용자입니다"),
     DATA_NOT_FOUND(HttpStatus.NOT_FOUND, "데이터를 찾을 수 없습니다."),
+    DATA_VALIDATION_FAIL(HttpStatus.NOT_FOUND, "데이터 유효성 검사를 실패했습니다."),
 
     /* 408 REQUEST_TIMEOUT : 클라이언트 요청이 서버에 도달했으나 서버 처리시간이 충분하지 않은 경우 */
     REQUEST_TIMEOUT(HttpStatus.REQUEST_TIMEOUT, "요청 시간 초과입니다"),
@@ -43,5 +47,4 @@ public enum ErrorCode {
     public ErrorResponse convertErrorResponse(Exception ex) {
         return ErrorResponse.create(ex,httpStatus,detail);
     }
-
 }

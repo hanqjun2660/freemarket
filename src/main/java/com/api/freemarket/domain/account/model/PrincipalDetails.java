@@ -50,10 +50,6 @@ public class PrincipalDetails implements OAuth2User, UserDetails {
         return userDTO.getStatus();
     }
 
-    public String getRegistStatus() {
-        return userDTO.getRegistStatus();
-    }
-
     @Override
     public Map<String, Object> getAttributes() {
         return attributes;
