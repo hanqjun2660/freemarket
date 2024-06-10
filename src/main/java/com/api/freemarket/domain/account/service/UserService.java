@@ -2,6 +2,7 @@ package com.api.freemarket.domain.account.service;
 
 import com.api.freemarket.domain.account.entity.Role;
 import com.api.freemarket.domain.account.entity.User;
+import com.api.freemarket.domain.account.enums.MemberStatus;
 import com.api.freemarket.domain.account.enums.RoleName;
 import com.api.freemarket.domain.account.model.PrincipalDetails;
 import com.api.freemarket.domain.account.model.RoleDTO;
@@ -36,6 +37,13 @@ public class UserService implements UserDetailsService {
 
         if(!existUser.isPresent()) {
            throw new UsernameNotFoundException("해당 ID의 사용자가 존재하지 않음");
+        }
+
+        if(MemberStatus.DISABLE.toString().equals(existUser.get().getStatus())){
+            throw new UsernameNotFoundException("탈퇴 계정입니다.");
+        }
+        if(MemberStatus.SLEEP.toString().equals(existUser.get().getStatus())){
+            throw new UsernameNotFoundException("휴면 계정입니다.");
         }
 
         UserDTO userDTO = modelMapper.map(existUser.get(), UserDTO.class);
