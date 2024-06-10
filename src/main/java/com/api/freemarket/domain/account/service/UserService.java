@@ -13,6 +13,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -43,6 +44,8 @@ public class UserService implements UserDetailsService {
         return new PrincipalDetails(userDTO);
     }
 
+    /*
+    @Transactional
     public User insertByMemberNo(UserDTO userDTO, long memberNo) {
         Optional<User> updateUser = Optional.ofNullable(userRepository.findByMemberNo(memberNo));
 
@@ -55,7 +58,9 @@ public class UserService implements UserDetailsService {
 
         return userRepository.save(updateUser.get());
     }
+    */
 
+    @Transactional
     public User joinUser(UserDTO userDTO) {
         return userRepository.save(modelMapper.map(userDTO, User.class));
     }

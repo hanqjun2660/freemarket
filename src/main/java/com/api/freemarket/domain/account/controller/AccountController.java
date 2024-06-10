@@ -26,11 +26,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.util.ObjectUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -56,7 +53,7 @@ public class AccountController {
     @Value("${spring.jwt.refresh-duration}")
     private Long refreshDuration;
 
-    private final AuthenticationManager authenticationManager;
+    private final PasswordEncoder passwordEncoder;
 
     private final JWTUtil jwtUtil;
 
@@ -76,27 +73,23 @@ public class AccountController {
     @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(examples = {@ExampleObject(description = SwaggerAccountDesc.NORMAL_USER_LOGIN_EX_DESC, value = SwaggerAccountDesc.NORMAL_USER_LOGIN_EX_VAL)}))
     @PostMapping("/login")
     public CommonResponse login(@RequestBody @Validated({ValidationGroups.loginValidation.class}) UserDTO userDTO, HttpServletResponse response) {
-        try {
-            Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(userDTO.getMemberId(), userDTO.getPassword())
-            );
 
-            PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
+        PrincipalDetails principalDetails = (PrincipalDetails) userService.loadUserByUsername(userDTO.getMemberId());
 
-            Long memberNo = principalDetails.getMemberNo();
-
-            Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
-            Iterator<? extends GrantedAuthority> iterator = authorities.iterator();
-            GrantedAuthority auth = iterator.next();
-            String role = auth.getAuthority();
-
-            redisService.tokenWithInsertRedis(memberNo, role, response);
-
-            return CommonResponse.OK(null);
-
-        } catch (BadCredentialsException e) {
-            return CommonResponse.ERROR("아이디 혹은 패스워드가 잘못되었습니다.");
+        if(!passwordEncoder.matches(userDTO.getPassword(), principalDetails.getPassword())) {
+            return CommonResponse.ERROR("비밀번호가 일치하지 않습니다.");
         }
+
+        Long memberNo = principalDetails.getMemberNo();
+
+        Collection<? extends GrantedAuthority> authorities = principalDetails.getAuthorities();
+        Iterator<? extends GrantedAuthority> iterator = authorities.iterator();
+        GrantedAuthority auth = iterator.next();
+        String role = auth.getAuthority();
+
+        redisService.tokenWithInsertRedis(memberNo, role, response);
+
+        return CommonResponse.OK(null);
     }
 
     @Operation(summary = "토큰 재발급", description = SwaggerAccountDesc.TOKEN_REISSUE_DESC)
@@ -172,6 +165,7 @@ public class AccountController {
         return CommonResponse.OK("정상적으로 처리됨");
     }
 
+    /*
     @Operation(summary = "추가 정보 입력(소셜 회원)", description = SwaggerAccountDesc.ADD_INFO_DESC)
     @ApiResponses(value = {
             @ApiResponse(responseCode = SwaggerCommonDesc.RESPONSE_SUCCESS_CODE, description = SwaggerAccountDesc.NORMAL_USER_LOGIN_SUCCESS_DESC,
@@ -209,6 +203,7 @@ public class AccountController {
 
         return CommonResponse.OK("정상적으로 처리됨");
     }
+    */
 
     @Operation(summary = "회원가입", description = SwaggerAccountDesc.JOIN_DESC)
     @ApiResponses(value = {
@@ -221,10 +216,16 @@ public class AccountController {
     })
     @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(examples = {@ExampleObject(description = SwaggerAccountDesc.JOIN_EX_DESC, value = SwaggerAccountDesc.JOIN_EX_VAL)}))
     @PostMapping("/join")
-    public CommonResponse join(@RequestBody @Validated({ValidationGroups.joinValidation.class}) UserDTO UserDTO) {
+    public CommonResponse join(@RequestBody @Validated({ValidationGroups.joinValidation.class}) UserDTO userDTO) {
+
+        String encodePassword = passwordEncoder.encode(userDTO.getPassword());
+        userDTO.setPassword(encodePassword);
 
         // 사용자 정보 DB 저장
-        User joinUser = userService.joinUser(UserDTO);
+        User joinUser = userService.joinUser(userDTO);
+        if(ObjectUtils.isEmpty(joinUser)) {
+            CommonResponse.ERROR("회원가입 실패");
+        }
 
         return CommonResponse.OK(null);
     }

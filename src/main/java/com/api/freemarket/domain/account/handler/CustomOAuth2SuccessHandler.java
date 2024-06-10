@@ -28,12 +28,6 @@ public class CustomOAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHa
         PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
         Long userNo = principalDetails.getMemberNo();
 
-        if("N".equals(principalDetails.getRegistStatus())) {
-            response.addCookie(createCookie("userNo", String.valueOf(userNo)));
-            response.setStatus(HttpStatus.UNAUTHORIZED.value());        // 401 발생하면 추가정보(휴대폰) 받는 페이지로 이동 시켜야함.
-            return;
-        }
-
         Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
         Iterator<? extends GrantedAuthority> iterator = authorities.iterator();
         GrantedAuthority auth = iterator.next();
