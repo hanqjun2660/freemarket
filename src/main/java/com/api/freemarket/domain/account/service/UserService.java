@@ -65,10 +65,13 @@ public class UserService implements UserDetailsService {
     @Transactional
     public User joinUser(UserDTO userDTO) {
         User saveUser = userRepository.save(modelMapper.map(userDTO, User.class));
+
         RoleDTO roleDTO = new RoleDTO();
         roleDTO.setName(String.valueOf(RoleName.ROLE_USER));
         roleDTO.setMemberNo(saveUser.getMemberNo());
+
         roleRepository.save(modelMapper.map(roleDTO, Role.class));
+
         return saveUser;
     }
 
