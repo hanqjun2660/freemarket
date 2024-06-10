@@ -1,5 +1,6 @@
 package com.api.freemarket.domain.account.entity;
 
+import com.api.freemarket.domain.account.enums.RoleName;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

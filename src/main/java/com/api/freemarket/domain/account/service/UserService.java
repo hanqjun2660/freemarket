@@ -1,8 +1,10 @@
 package com.api.freemarket.domain.account.service;
 
+import com.api.freemarket.domain.account.entity.Role;
 import com.api.freemarket.domain.account.entity.User;
 import com.api.freemarket.domain.account.enums.RoleName;
 import com.api.freemarket.domain.account.model.PrincipalDetails;
+import com.api.freemarket.domain.account.model.RoleDTO;
 import com.api.freemarket.domain.account.model.UserDTO;
 import com.api.freemarket.domain.account.repository.RoleRepository;
 import com.api.freemarket.domain.account.repository.UserRepository;
@@ -37,9 +39,9 @@ public class UserService implements UserDetailsService {
         }
 
         UserDTO userDTO = modelMapper.map(existUser.get(), UserDTO.class);
-        /*Role role = roleRepository.findByMemberNo(userDTO.getMemberNo());
-        userDTO.setRole(role.getName());*/
-        userDTO.setRole(String.valueOf(RoleName.ROLE_USER));
+        Role role = roleRepository.findByMemberNo(userDTO.getMemberNo());
+        userDTO.setRole(role.getName());
+        /*userDTO.setRole(String.valueOf(RoleName.ROLE_USER));*/
 
         return new PrincipalDetails(userDTO);
     }
@@ -62,7 +64,12 @@ public class UserService implements UserDetailsService {
 
     @Transactional
     public User joinUser(UserDTO userDTO) {
-        return userRepository.save(modelMapper.map(userDTO, User.class));
+        User saveUser = userRepository.save(modelMapper.map(userDTO, User.class));
+        RoleDTO roleDTO = new RoleDTO();
+        roleDTO.setName(String.valueOf(RoleName.ROLE_USER));
+        roleDTO.setMemberNo(saveUser.getMemberNo());
+        roleRepository.save(modelMapper.map(roleDTO, Role.class));
+        return saveUser;
     }
 
     public boolean existsByNickname(String nickname) {
