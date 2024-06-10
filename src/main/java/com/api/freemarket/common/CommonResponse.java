@@ -55,5 +55,9 @@ public class CommonResponse<T> {
     public static <T> CommonResponse<T> ERROR(T data) {
         return ERROR(null, data);
     }
+
+    public static CommonResponse ERROR(HttpStatus httpStatus, String message) {
+        return new CommonResponse(httpStatus, message, null);
+    }
     /*------------- OVER LOADING END -------------*/
 }

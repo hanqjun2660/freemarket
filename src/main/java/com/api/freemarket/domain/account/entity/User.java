@@ -1,5 +1,6 @@
 package com.api.freemarket.domain.account.entity;
 
+import com.api.freemarket.domain.account.enums.MemberStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
@@ -53,5 +54,15 @@ public class User {
 
     @Column(name = "member_id")
     private String memberId;
+
+    @PrePersist
+    public void prePersist() {
+        if(status == null){
+            this.status = String.valueOf(MemberStatus.ACTIVE);
+        }
+        if(joinDate == null){
+            this.joinDate = new Date();
+        }
+    }
 
 }

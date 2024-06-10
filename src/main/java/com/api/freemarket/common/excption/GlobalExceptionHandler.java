@@ -1,8 +1,10 @@
 package com.api.freemarket.common.excption;
 
 import com.api.freemarket.common.CommonResponse;
+import com.api.freemarket.domain.account.enums.MemberStatus;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.ErrorResponse;
@@ -50,7 +52,14 @@ public class GlobalExceptionHandler {
             fieldErrors.put(fieldName, errorMessage);
         });
 
-//        return CommonResponse.ERROR((String)HttpStatus.NOT_FOUND, "데이터 유효성 검사를 실패했습니다.", fieldErrors);
         return CommonResponse.ERROR(DATA_VALIDATION_FAIL.getHttpStatus(), DATA_VALIDATION_FAIL.getDetail(), fieldErrors);
+    }
+
+    @ExceptionHandler(value = {UsernameNotFoundException.class})
+    public CommonResponse handleValidationExceptions(UsernameNotFoundException ex) {
+
+        log.error("UsernameNotFoundException throw Exception : {}", MEMBER_STATUS_ERROR);
+
+        return CommonResponse.ERROR(MEMBER_STATUS_ERROR.getHttpStatus(), ex.getMessage());
     }
 }
