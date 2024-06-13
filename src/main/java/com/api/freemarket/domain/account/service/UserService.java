@@ -1,5 +1,6 @@
 package com.api.freemarket.domain.account.service;
 
+import com.api.freemarket.common.CommonResponse;
 import com.api.freemarket.domain.account.entity.Role;
 import com.api.freemarket.domain.account.entity.User;
 import com.api.freemarket.domain.account.enums.MemberStatus;
