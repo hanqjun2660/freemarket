@@ -8,17 +8,17 @@ server:
 
 spring:
   jwt:
-    secret: vmfhaltmskdlstkfkdgodyroqkfwkdbalroqkfwkdbalaaaaaaaaaaaaaaaabbbbb
+    secret: ENC(GJeIVh04lFNRkVsaNC72Rdm7lOFvjKte+khorLQdxW2Hcqc6pcHaiNi5OEDB/FX6kwNglto5TN/lpVQk9gIQkOhAdjOCycFq4j2n726IFAI=)
     access-duration: 60000
     refresh-duration: 86400000
 
   data:
     redis:
-      host: host.minikube.internal
+      host: ENC(MjarGGvBnGJ91MjwENopxWZOsGED5UFvFiBY6FZk+KY=)
       port: 6379
       database: 0
-      username: free
-      password: free
+      username: ENC(LYZc+YsS3ifxd7J9/D4aaA==)
+      password: ENC(dXTenGyTCeq1/hMlBAxWFw==)
 
   security:
     oauth2:
@@ -26,24 +26,24 @@ spring:
         registration:
           kakao:
             client-name: kakao
-            client-id: 5397e5b5bfb8d92a4bdc0636634328ba
-            client-secret: FviuK7zk0KQz9lsEUv54kcb3tSbbfUsM
+            client-id: ENC(3xLlVKBgDlTCM0Be2m9njpr90kHo5LTiPV6UjjRs0gbk4NdInQ6OM6+4LZmBiGbO)
+            client-secret: ENC(BQBXYZgUV5lWa6SbNEgSzL3xrK+Qgz4W7iYJFkdOTVowAhiLiVLuTI1wY8wvmjtU)
             redirect-uri: https://freeapi.devsj.site/login/oauth2/code/kakao
             authorization-grant-type: authorization_code
             scope: profile_nickname,profile_image,account_email
             client-authentication-method: client_secret_post
           naver:
             client-name: naver
-            client-id: YGr2FqhHn4_wQ1_8wvs7
-            client-secret: TzMBhQfSkJ
+            client-id: ENC(HXgTtWJy2iVTTGiRaVH92dmXwrHkBPlYX4afBhTs7I0=)
+            client-secret: ENC(X1vkWw0hd/r/++SWaMCoJOih2hOxYwQU)
             redirect-uri: https://freeapi.devsj.site/login/oauth2/code/naver
             authorization-grant-type: authorization_code
             scope: name,email,nickname,profile_image
             client-authentication-method: client_secret_post
           google:
             client-name: google
-            client-id: 82131316117-dginrgt07m74sns9nv5errh3v3bd886q.apps.googleusercontent.com
-            client-secret: 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
+            client-id: ENC(+vkikOV6JaW+l2rqAf0woV5kZgXJkorzgzhXZ9wzlXHg4gJljsTN19JMFTjzSWH49klp6t6jLKl7zwtwV0cMA7iizpr1GddSjRHv5zEm3Uo=)
+            client-secret: ENC(Rk7AoDHcQweHUdNNRrXbTJMWzZFJW/RMYMR+Q/df+Wt5G26u5cfBfOLgnRQSv7OP)
             redirect-uri: https://freeapi.devsj.site/login/oauth2/code/google
             authorization-grant-type: authorization_code
             scope: profile,email
@@ -61,9 +61,9 @@ spring:
 
   datasource:
     driver-class-name: org.h2.Driver
-    url: 'jdbc:h2:mem:freemarket'
-    username: free
-    password: free
+    url: ENC(OnwTxgnQ+6j00RJCiayYQC/FZ3zIztYWkwLnlH6uh7c=)
+    username: ENC(wSDva3PJXYOsIUs45hW7Tg==)
+    password: ENC(kNSKpYyIf+YwFcLR1mSExg==)
   h2:
     console:
       enabled: true
@@ -88,7 +88,7 @@ spring:
     host: smtp.gmail.com
     port: 587
     username: freemarketofficial58@gmail.com
-    password: dlgx xwwt mdrr nhic
+    password: ENC(fGu34GaIV/gfZNM6QiEBcCbG+oWkezuhL/fVLHHjchA=)
     properties:
       mail:
         smtp:
@@ -111,3 +111,10 @@ springdoc:
     path: /api-docs
   default-consumes-media-type: application/json;charset=UTF-8
   default-produces-media-type: application/json;charset=UTF-8
+
+jasypt:
+  encryptor:
+    bean: jasyptStringEncryptor
+    algorithm: PBEWithMD5AndDES
+    iv-generator-classname: org.jasypt.iv.NoIvGenerator
+    string-output-type: base64

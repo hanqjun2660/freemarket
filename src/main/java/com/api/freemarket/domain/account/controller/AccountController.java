@@ -218,6 +218,12 @@ public class AccountController {
     @PostMapping("/join")
     public CommonResponse join(@RequestBody @Validated({ValidationGroups.joinValidation.class}) UserDTO userDTO) {
 
+        boolean existMemberId = userService.existsByMemberId(userDTO.getMemberId());
+
+        if(existMemberId) {
+            return CommonResponse.ERROR("해당 아이디를 사용하는 사용자가 존재합니다.", false);
+        }
+
         String encodePassword = passwordEncoder.encode(userDTO.getPassword());
         userDTO.setPassword(encodePassword);
 
