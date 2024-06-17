@@ -115,6 +115,7 @@ springdoc:
 jasypt:
   encryptor:
     bean: jasyptStringEncryptor
+    password: ${JASYPT_ENCRYPTOR_PASSWORD:defaultPassword}
     algorithm: PBEWithMD5AndDES
     iv-generator-classname: org.jasypt.iv.NoIvGenerator
     string-output-type: base64
