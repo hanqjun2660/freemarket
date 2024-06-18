@@ -7,6 +7,7 @@ import com.api.freemarket.config.swagger.SwaggerAccountDesc;
 import com.api.freemarket.config.swagger.SwaggerCommonDesc;
 import com.api.freemarket.domain.account.entity.User;
 import com.api.freemarket.domain.account.enums.RoleName;
+import com.api.freemarket.domain.account.model.AddressDTO;
 import com.api.freemarket.domain.account.model.PrincipalDetails;
 import com.api.freemarket.domain.account.model.RedisData;
 import com.api.freemarket.domain.account.model.UserDTO;
@@ -22,6 +23,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -30,10 +32,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.util.ObjectUtils;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.Duration;
 import java.util.Collection;
@@ -216,7 +215,7 @@ public class AccountController {
     })
     @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(examples = {@ExampleObject(description = SwaggerAccountDesc.JOIN_EX_DESC, value = SwaggerAccountDesc.JOIN_EX_VAL)}))
     @PostMapping("/join")
-    public CommonResponse join(@RequestBody @Validated({ValidationGroups.joinValidation.class}) UserDTO userDTO) {
+    public CommonResponse join(@RequestBody @Validated({ValidationGroups.joinValidation.class}) UserDTO userDTO, @RequestBody AddressDTO addressDTO) {
 
         boolean existMemberId = userService.existsByMemberId(userDTO.getMemberId());
 
@@ -228,7 +227,7 @@ public class AccountController {
         userDTO.setPassword(encodePassword);
 
         // 사용자 정보 DB 저장
-        User joinUser = userService.joinUser(userDTO);
+        User joinUser = userService.joinUser(userDTO, addressDTO);
         if(ObjectUtils.isEmpty(joinUser)) {
             CommonResponse.ERROR("회원가입 실패");
         }
@@ -255,8 +254,6 @@ public class AccountController {
         } else {
             return CommonResponse.OK("사용 가능한 별명입니다.", !exists);
         }
-
-
     }
 
     @Operation(summary = "아이디 중복 체크", description = SwaggerAccountDesc.MEMBER_ID_DESC)
@@ -283,5 +280,29 @@ public class AccountController {
         } else {
             return CommonResponse.OK("사용 가능한 아이디입니다.", !exists);
         }
+    }
+
+    @PostMapping("/social-user-join")
+    public CommonResponse socialUserJoin(@RequestBody @Validated({ValidationGroups.addInfoValidation.class}) UserDTO userDTO, @RequestBody @Validated({ValidationGroups.addInfoValidation.class}) AddressDTO addressDTO, HttpSession session) {
+
+        /*try {*/
+            PrincipalDetails principalDetails = (PrincipalDetails) session.getAttribute(PrincipalDetails.PRINCIPAL_SESSION_KEY);
+            String memberId = principalDetails.getMemberId();
+
+            userDTO.setMemberId(memberId);
+
+            User joinUser = userService.joinUser(userDTO, addressDTO);
+
+            if(!ObjectUtils.isEmpty(joinUser)) {
+                return CommonResponse.OK("회원가입이 정상 처리 되었습니다.",null);
+            }
+
+            return CommonResponse.ERROR("회원가입이 정상적으로 처리되지 않았습니다.",null);
+        /*} catch (ClassCastException e) {
+            return CommonResponse.ERROR("정상적인 접근이 아닙니다.", null);
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+            return CommonResponse.ERROR("내부 서버 오류", null);
+        }*/
     }
 }

@@ -49,9 +49,6 @@ public class User {
     @Column(name = "join_date")
     private Date joinDate;
 
-    @Column(name = "address")
-    private String address;
-
     @Column(name = "member_id")
     private String memberId;
 

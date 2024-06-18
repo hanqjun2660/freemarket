@@ -1,13 +1,16 @@
 package com.api.freemarket.domain.account.service;
 
 import com.api.freemarket.common.CommonResponse;
+import com.api.freemarket.domain.account.entity.Address;
 import com.api.freemarket.domain.account.entity.Role;
 import com.api.freemarket.domain.account.entity.User;
 import com.api.freemarket.domain.account.enums.MemberStatus;
 import com.api.freemarket.domain.account.enums.RoleName;
+import com.api.freemarket.domain.account.model.AddressDTO;
 import com.api.freemarket.domain.account.model.PrincipalDetails;
 import com.api.freemarket.domain.account.model.RoleDTO;
 import com.api.freemarket.domain.account.model.UserDTO;
+import com.api.freemarket.domain.account.repository.AddressRepository;
 import com.api.freemarket.domain.account.repository.RoleRepository;
 import com.api.freemarket.domain.account.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +34,8 @@ public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
 
     private final RoleRepository roleRepository;
+
+    private final AddressRepository addressRepository;
 
     @Override
     public UserDetails loadUserByUsername(String memberId) throws UsernameNotFoundException {
@@ -72,7 +77,7 @@ public class UserService implements UserDetailsService {
     */
 
     @Transactional
-    public User joinUser(UserDTO userDTO) {
+    public User joinUser(UserDTO userDTO, AddressDTO addressDTO) {
         User saveUser = userRepository.save(modelMapper.map(userDTO, User.class));
 
         RoleDTO roleDTO = new RoleDTO();
@@ -80,6 +85,9 @@ public class UserService implements UserDetailsService {
         roleDTO.setMemberNo(saveUser.getMemberNo());
 
         roleRepository.save(modelMapper.map(roleDTO, Role.class));
+
+        addressDTO.setMemberNo(saveUser.getMemberNo());
+        addressRepository.save(modelMapper.map(addressDTO, Address.class));
 
         return saveUser;
     }

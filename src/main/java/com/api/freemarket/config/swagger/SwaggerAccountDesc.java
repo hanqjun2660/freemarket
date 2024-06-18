@@ -30,7 +30,7 @@ public final class SwaggerAccountDesc {
     public static final String JOIN_DESC = "회원가입 API";
     public static final String JOIN_SUCCESS_DESC = "성공시 200코드 반환";
     public static final String JOIN_FAILED_DESC = "실패시 500코드 반환";
-    public static final String JOIN_EX_DESC = "아이디,비밀번호,이름,별명,이메일 JSON으로 전달";
+    public static final String JOIN_EX_DESC = "아이디,비밀번호,이름,별명,이메일,(주소: 시,도 / 시,군,구 / 동,읍,면) JSON으로 전달";
     public static final String JOIN_EX_VAL = """
             {
                 "memberId":"회원 아이디",
@@ -38,7 +38,10 @@ public final class SwaggerAccountDesc {
                 "name":"이름",
                 "nickname":"별명",
                 "phone":"01012345678",
-                "email":"abcd@gmail.com"
+                "email":"abcd@gmail.com",
+                "address1":"서울시",
+                "address2":"강남구",
+                "address3":"도곡동"
             }
             """;
 

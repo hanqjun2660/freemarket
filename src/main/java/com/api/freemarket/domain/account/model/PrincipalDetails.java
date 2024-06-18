@@ -10,6 +10,8 @@ import java.util.Map;
 
 public class PrincipalDetails implements OAuth2User, UserDetails {
 
+    public final static String PRINCIPAL_SESSION_KEY = "PRINCIPAL_SESSION_KEY";
+
     private UserDTO userDTO;
     
     private Map<String, Object> attributes;
