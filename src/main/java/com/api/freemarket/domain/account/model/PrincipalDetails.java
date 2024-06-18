@@ -56,6 +56,10 @@ public class PrincipalDetails implements OAuth2User, UserDetails {
         return userDTO.getNickname();
     }
 
+    public String getProvider() {
+        return userDTO.getProvider();
+    }
+
     @Override
     public Map<String, Object> getAttributes() {
         return attributes;
