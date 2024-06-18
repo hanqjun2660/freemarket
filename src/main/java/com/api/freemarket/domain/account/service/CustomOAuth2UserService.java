@@ -79,6 +79,8 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             userDTO.setMemberId(memberId);
             userDTO.setName(oAuth2Response.getName());
             userDTO.setEmail(oAuth2Response.getEmail());
+            userDTO.setProfileImg(oAuth2Response.getProfileImage());
+            userDTO.setProvider(oAuth2Response.getProvider());
 
             return new PrincipalDetails(userDTO, oAuth2User.getAttributes());
         } else {

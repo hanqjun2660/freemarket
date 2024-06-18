@@ -52,6 +52,10 @@ public class PrincipalDetails implements OAuth2User, UserDetails {
         return userDTO.getStatus();
     }
 
+    public String getNickName() {
+        return userDTO.getNickname();
+    }
+
     @Override
     public Map<String, Object> getAttributes() {
         return attributes;
@@ -76,9 +80,10 @@ public class PrincipalDetails implements OAuth2User, UserDetails {
         return userDTO.getPassword();
     }
 
+    // OAuth2AuthorizedClient 클래스내에서 PrincipalName으로 사용됨
     @Override
     public String getUsername() {
-        return userDTO.getNickname();
+        return String.valueOf(attributes.get("id"));
     }
 
     // 자격증명 부분 구현해야함 지금은 다 true라 됨
