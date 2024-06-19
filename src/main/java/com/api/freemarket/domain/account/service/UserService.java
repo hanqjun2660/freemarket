@@ -113,7 +113,7 @@ public class UserService implements UserDetailsService {
     public void existMemberIdAndEmail(FindPasswordRequest request) {
         Optional<User> optionalUser = userRepository.existsByMemberIdAndEmail(request.getMemberId(), request.getEmail());
 
-        if(optionalUser.isPresent()) {
+        if(!optionalUser.isPresent()) {
             throw new UsernameNotFoundException("해당 가입정보가 존재하지 않습니다.");
         }
     }
@@ -122,7 +122,7 @@ public class UserService implements UserDetailsService {
     public void tempChangePassword(String memberId, String encodePassword) {
         Optional<User> findUser = Optional.ofNullable(userRepository.findByMemberId(memberId));
 
-        if(findUser.isPresent()) {
+        if(!findUser.isPresent()) {
             throw new UsernameNotFoundException("해당 회원이 존재하지 않습니다.");
         }
 
