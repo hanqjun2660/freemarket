@@ -110,7 +110,7 @@ public class UserService implements UserDetailsService {
     }
 
     @Transactional
-    public void existMemberIdAndEmail(FindPasswordRequest request) {
+    public void existMemberIdAndEmail(FindIdAndPwRequest request) {
         Optional<User> optionalUser = userRepository.existsByMemberIdAndEmail(request.getMemberId(), request.getEmail());
 
         if(!optionalUser.isPresent()) {
@@ -127,5 +127,24 @@ public class UserService implements UserDetailsService {
         }
 
         findUser.get().setPassword(encodePassword);
+    }
+
+    public void existsEmail(FindIdAndPwRequest request) {
+        boolean userExists = userRepository.existsByEmail(request.getEmail());
+
+        // 값이 있으면 true, 없으면 false
+        if(!userExists) {
+            throw new UsernameNotFoundException("해당 가입정보가 존재하지 않습니다.");
+        }
+    }
+
+    public UserDTO findByEmail(String email) {
+        Optional<User> optionalUser = userRepository.findByEmail(email);
+
+        if(!optionalUser.isPresent()) {
+            throw new UsernameNotFoundException("해당 가입정보가 존재하지 않습니다.");
+        }
+
+        return modelMapper.map(optionalUser.get(), UserDTO.class);
     }
 }

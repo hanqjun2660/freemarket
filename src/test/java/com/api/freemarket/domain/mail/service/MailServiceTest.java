@@ -1,6 +1,7 @@
 package com.api.freemarket.domain.mail.service;
 
 import com.api.freemarket.domain.account.entity.User;
+import com.api.freemarket.domain.account.model.FindIdAndPwRequest;
 import com.api.freemarket.domain.account.model.FindPasswordRequest;
 import com.api.freemarket.domain.account.repository.UserRepository;
 import com.api.freemarket.domain.account.service.UserService;
@@ -48,7 +49,7 @@ public class MailServiceTest {
     @Test
     void 비밀번호_찾기_본인인증용_인증번호_발송_테스트_예외_발생() {
         // given
-        FindPasswordRequest request = new FindPasswordRequest();
+        FindIdAndPwRequest request = new FindIdAndPwRequest();
         request.setMemberId("rkdtjd56");
         request.setEmail("hanqjun2660@gmail.com");
         request.setEmailTitle("[인증번호] FreeMarket 이메일 인증번호 입니다.");
@@ -69,7 +70,7 @@ public class MailServiceTest {
     @Test
     void 비밀번호_찾기_본인인증용_인증번호_발송_테스트_메일_전송_실패() {
         // given
-        FindPasswordRequest request = new FindPasswordRequest();
+        FindIdAndPwRequest request = new FindIdAndPwRequest();
         request.setMemberId("rkdtjd56");
         request.setEmail("hanqjun2660@gmail.com");
         request.setEmailTitle("[인증번호] FreeMarket 이메일 인증번호 입니다.");
@@ -92,7 +93,7 @@ public class MailServiceTest {
     @Test
     void 비밀번호_찾기_본인인증용_인증번호_발송_테스트_메일_전송_성공() {
         // given
-        FindPasswordRequest request = new FindPasswordRequest();
+        FindIdAndPwRequest request = new FindIdAndPwRequest();
         request.setMemberId("rkdtjd56");
         request.setEmail("hanqjun2660@gmail.com");
         request.setEmailTitle("[인증번호] FreeMarket 이메일 인증번호 입니다.");

@@ -335,7 +335,7 @@ public class AccountController {
     })
     @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(examples = {@ExampleObject(value = SwaggerAccountDesc.FIND_PASSWORD_CERT_EX_VAL)}))
     @PostMapping("/find-password/send-cert-num")
-    public CommonResponse findPassword(@RequestBody @Valid FindPasswordRequest request) {
+    public CommonResponse findPassword(@RequestBody @Validated({ValidationGroups.findPasswordValidation.class}) FindIdAndPwRequest request) {
 
         String title = "[인증번호] FreeMarket 이메일 인증번호 입니다.";
         String certCode = emailUtil.createCode();
@@ -367,7 +367,7 @@ public class AccountController {
     })
     @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(examples = {@ExampleObject(value = SwaggerAccountDesc.TEMP_PASSWORD_ISSUED_EX_VAL)}))
     @PostMapping("/find-password/temp-password")
-    public CommonResponse issuedTempPassword(@RequestBody @Valid FindPasswordRequest request) {
+    public CommonResponse issuedTempPassword(@RequestBody @Validated({ValidationGroups.findPasswordValidation.class}) FindIdAndPwRequest request) {
 
         String title = "[임시 비밀번호] FreeMarket에서 임시 비밀번호를 발송드립니다.";
         String tempPassword = emailUtil.createTempPassword();
@@ -381,4 +381,68 @@ public class AccountController {
 
         return CommonResponse.OK("임시 비밀번호가 메일로 발송되었습니다.");
     }
+
+    @Operation(summary = "아이디 찾기용 이메일 인증번호 발송", description = SwaggerAccountDesc.FIND_ID_CERT_DESC)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = SwaggerCommonDesc.RESPONSE_SUCCESS_CODE, description = SwaggerAccountDesc.FIND_ID_CERT_SUCCESS_DESC,
+                    content = @Content(schema = @Schema(implementation = CommonResponse.class),
+                            examples = @ExampleObject(value = SwaggerAccountDesc.FIND_ID_CERT_SUCCESS_EX_VAL))),
+            @ApiResponse(responseCode = SwaggerCommonDesc.RESPONSE_FAILED_CODE, description = SwaggerAccountDesc.FIND_ID_CERT_FAILED_DESC,
+                    content = @Content(schema = @Schema(implementation = CommonResponse.class),
+                            examples = @ExampleObject(value = SwaggerCommonDesc.RESPONSE_FAILED_DESC)))
+    })
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(examples = {@ExampleObject(value = SwaggerAccountDesc.FIND_ID_CERT_EX_VAL)}))
+    @PostMapping("/find-id/send-cert-num")
+    public CommonResponse findId(@RequestBody @Validated({ValidationGroups.findIdValidation.class}) FindIdAndPwRequest request) {
+
+        String title = "[인증번호] FreeMarket 이메일 인증번호 입니다.";
+        String certCode = emailUtil.createCode();
+
+        request.setEmailTitle(title);
+        request.setEmailText(certCode);
+
+        // 유저가 있는지 확인
+        userService.existsEmail(request);
+
+        // 인증번호 메일 발송 후 확인용으로 redis에 저장
+        SimpleMailMessage emailForm = emailUtil.createEmailForm(request.getEmail(), title, "인증번호: " + certCode);
+        mailService.sendEmail(emailForm);
+        redisService.setValues(request.getEmail(), certCode, Duration.ofMillis(authCodeExpireationMillis));
+
+        Map<String, Long> response = new HashMap<>();
+        response.put("duration", authCodeExpireationMillis);
+
+        return CommonResponse.OK("인증번호가 발송되었습니다.", response);
+    }
+
+    @Operation(summary = "아이디 찾기 정보(아이디/소셜로그인 정보)", description = SwaggerAccountDesc.FIND_ID_USER_INFO_DESC)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = SwaggerCommonDesc.RESPONSE_SUCCESS_CODE, description = SwaggerAccountDesc.FIND_ID_USER_INFO_SUCCESS_DESC,
+                    content = @Content(schema = @Schema(implementation = CommonResponse.class),
+                            examples = @ExampleObject(value = SwaggerAccountDesc.FIND_ID_USER_INFO_SUCCESS_EX_VAL))),
+            @ApiResponse(responseCode = SwaggerCommonDesc.RESPONSE_FAILED_CODE, description = SwaggerAccountDesc.FIND_ID_USER_INFO_FAILED_DESC,
+                    content = @Content(schema = @Schema(implementation = CommonResponse.class),
+                            examples = @ExampleObject(value = SwaggerCommonDesc.RESPONSE_FAILED_DESC)))
+    })
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(examples = {@ExampleObject(value = SwaggerAccountDesc.FIND_ID_USER_INFO_EX_VAL)}))
+    @PostMapping("/find-id/user-info")
+    public CommonResponse findIdUserInfo(@RequestBody @Validated({ValidationGroups.findIdValidation.class}) FindIdAndPwRequest request) {
+
+        String email = request.getEmail();
+
+        UserDTO userDTO = userService.findByEmail(email);
+
+        Map<String, Object> data = new HashMap<>();
+
+        if(userDTO.getProvider().isEmpty()){    // 일반 회원의 경우
+            data.put("memberID", userDTO.getMemberId());
+            return CommonResponse.OK("회원가입이 정상 처리 되었습니다.",data);
+        } else {                                // 소셜 로그인 경우
+            data.put("provider", userDTO.getProvider());
+            return CommonResponse.OK("회원가입이 정상 처리 되었습니다.",data);
+        }
+
+
+    }
+
 }

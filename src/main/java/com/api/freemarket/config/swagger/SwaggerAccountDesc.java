@@ -146,4 +146,67 @@ public final class SwaggerAccountDesc {
                 "email":"asdf@asdf.com"
             }
             """;
+
+
+    // 아이디 찾기용 이메일 인증번호 발송 요청
+    public static final String FIND_ID_CERT_DESC = """
+            아이디 찾기를 위해 이메일을 입력받아 해당 사용자가 실제 존재하는지 확인 후
+            이메일로 인증번호를 발송하는 API
+             - 이메일로 발송된 인증번호를 검증하는 API는 '/api/v1/mail/valid-cert-num'을 사용하여야한다.
+            """;
+    public static final String FIND_ID_CERT_SUCCESS_DESC = "성공시 200코드 반환";
+
+    public static final String FIND_ID_CERT_FAILED_DESC = "성공시 500코드 반환";
+
+    public static final String FIND_ID_CERT_EX_VAL = """
+            {
+                "email":"asdf@asdf.com"
+            }
+            """;
+
+    public static final String FIND_ID_CERT_SUCCESS_EX_VAL = """
+            {
+                "statusCode": "200",
+                "message": "성공메세지",
+                "data": {
+                    "duration" : 1800000
+                }
+            }
+            """;
+
+    // 임시 비밀번호 발급
+    public static final String FIND_ID_USER_INFO_DESC = """
+            아이디 찾기 이메일 인증 완료 후 소셜로그인유저인지 일반로그인 회원인지를 확인해서
+            정보를 RETURN 하는 API
+            """;
+
+    public static final String FIND_ID_USER_INFO_SUCCESS_DESC = "성공시 200코드 반환";
+
+    public static final String FIND_ID_USER_INFO_FAILED_DESC = "성공시 500코드 반환";
+
+    public static final String FIND_ID_USER_INFO_EX_VAL = """
+            {
+                "email":"asdf@asdf.com"
+            }
+            """;
+
+    public static final String FIND_ID_USER_INFO_SUCCESS_EX_VAL = """
+       {
+            "소셜 로그인 시" : {
+                "statusCode": "200",
+                "message": "성공메세지",
+                "data": {
+                    "provider" : "naver or kakao or google"
+                }
+            },
+            
+            "일반 회원가입 시" : {
+                "statusCode": "200",
+                "message": "성공메세지",
+                "data": {
+                    "memberId" : "test12345"
+                }
+            }
+       }
+       """;
 }
