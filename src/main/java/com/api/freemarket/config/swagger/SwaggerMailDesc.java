@@ -18,7 +18,7 @@ public final class SwaggerMailDesc {
     public static final String VALID_MAIL_NUMBER_EX_DESC = "이메일 인증 번호 필수";
     public static final String VALID_MAIL_NUMBER_EX_VAL = """
             {
-                "eamil":"example@example.com",
+                "email":"example@example.com",
                 "certNo":"12345678"
             }
             """;

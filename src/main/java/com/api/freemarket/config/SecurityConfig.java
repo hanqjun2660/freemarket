@@ -124,7 +124,7 @@ public class SecurityConfig {
                 "/error",
                 "/h2-console/**",
                 "/api/v1/mail/**",
-                "/api/v1/account/login"
+                "/api/v1/account/**"
         );
     }
 }

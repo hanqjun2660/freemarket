@@ -1,6 +1,7 @@
 package com.api.freemarket.domain.mail.controller;
 
 import com.api.freemarket.common.CommonResponse;
+import com.api.freemarket.common.email.EmailUtil;
 import com.api.freemarket.config.swagger.SwaggerCommonDesc;
 import com.api.freemarket.config.swagger.SwaggerMailDesc;
 import com.api.freemarket.domain.account.service.RedisService;
@@ -18,15 +19,13 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
 import java.time.Duration;
-import java.util.Random;
 
 @Tag(name="Mail", description = "인증 번호 메일발송 및 검증")
 @RestController
@@ -34,6 +33,8 @@ import java.util.Random;
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/mail")
 public class Mailcontroller {
+
+    private final EmailUtil emailUtil;
 
     private final RedisService redisService;
 
@@ -55,10 +56,12 @@ public class Mailcontroller {
     @PostMapping("/send")
     public CommonResponse sendCodeToEmail(@RequestBody @Valid CertNumberSendRequest certNumberSendRequest) {
         String title = "[인증번호] FreeMarket 이메일 인증번호 입니다.";
-        String origincode = createCode();
+        String origincode = emailUtil.createCode();
         String authCode = "인증번호 : " + origincode;
 
-        mailService.sendEmail(certNumberSendRequest.getToEmail(), title, authCode);
+        SimpleMailMessage emailForm = emailUtil.createEmailForm(certNumberSendRequest.getToEmail(), title, "인증번호 : " + authCode);
+
+        mailService.sendEmail(emailForm);
 
         try {
             redisService.setValues(certNumberSendRequest.getToEmail(), origincode, Duration.ofMillis(authCodeExpireationMillis));
@@ -96,20 +99,5 @@ public class Mailcontroller {
         }
 
         return CommonResponse.OK(null);
-    }
-
-    private String createCode() {
-        int length = 8;
-        try {
-            Random random = SecureRandom.getInstanceStrong();
-            StringBuilder sb = new StringBuilder();
-            for(int i = 0; i < length; i++) {
-                sb.append(random.nextInt(10));
-            }
-            return sb.toString();
-        } catch (NoSuchAlgorithmException e) {
-            log.debug("createCode exception");
-            throw new RuntimeException(e);
-        }
     }
 }

@@ -60,6 +60,9 @@ public class User {
         if(joinDate == null){
             this.joinDate = new Date();
         }
+        if(provider == null) {
+            this.provider = "site";
+        }
     }
 
 }

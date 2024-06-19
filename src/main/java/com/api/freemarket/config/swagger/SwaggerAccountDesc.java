@@ -37,15 +37,19 @@ public final class SwaggerAccountDesc {
     public static final String JOIN_FAILED_DESC = "실패시 500코드 반환";
     public static final String JOIN_EX_VAL = """
             {
-                "memberId":"회원 아이디",
-                "password":"비밀번호",
-                "name":"이름",
-                "nickname":"별명",
-                "phone":"01012345678",
-                "email":"abcd@gmail.com",
-                "address1":"서울시",
-                "address2":"강남구",
-                "address3":"도곡동"
+                "userDTO": {
+                    "memberId": "아이디",
+                    "password": "비밀번호",
+                    "name": "이름",
+                    "nickname": "닉네임",
+                    "phone": "01012345678",
+                    "email": "abcd@gmail.com"
+                },
+                "addressDTO": {
+                    "address1": "서울시",
+                    "address2": "강남구",
+                    "address3": "도곡동"
+                }
             }
             """;
 
@@ -96,6 +100,50 @@ public final class SwaggerAccountDesc {
                 "address2": "광진구",
                 "address3": "중곡동"
               }
+            }
+            """;
+
+    // 비밀번호 찾기용 이메일 인증번호 발송 요청
+    public static final String FIND_PASSWORD_CERT_DESC = """
+            비밀번호 찾기를 위해 아이디, 이메일을 입력받아 해당 사용자가 실제 존재하는지 확인 후
+            이메일로 인증번호를 발송하는 API
+             - 이메일로 발송된 인증번호를 검증하는 API는 '/api/v1/mail/valid-cert-num'을 사용하여야한다.
+            """;
+    public static final String FIND_PASSWORD_CERT_SUCCESS_DESC = "성공시 200코드 반환";
+
+    public static final String FIND_PASSWORD_CERT_FAILED_DESC = "성공시 500코드 반환";
+
+    public static final String FIND_PASSWORD_CERT_EX_VAL = """
+            {
+                "memberId":"아이디",
+                "email":"asdf@asdf.com"
+            }
+            """;
+
+    public static final String FIND_PASSWORD_CERT_SUCCESS_EX_VAL = """
+            {
+                "statusCode": "200",
+                "message": "성공메세지",
+                "data": {
+                    "duration" : 1800000
+                }
+            }
+            """;
+    
+    // 임시 비밀번호 발급
+    public static final String TEMP_PASSWORD_ISSUED_DESC = """
+            비밀번호 찾기용 이메일 인증번호 발송 요청 및 검증이 이루어진 후 임시 비밀번호를
+            이메일로 발송해주는 API
+            """;
+
+    public static final String TEMP_PASSWORD_ISSUED_SUCCESS_DESC = "성공시 200코드 반환";
+
+    public static final String TEMP_PASSWORD_ISSUED_FAILED_DESC = "성공시 500코드 반환";
+
+    public static final String TEMP_PASSWORD_ISSUED_EX_VAL = """
+            {
+                "memberId":"아이디",
+                "email":"asdf@asdf.com"
             }
             """;
 }

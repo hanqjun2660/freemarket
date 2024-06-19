@@ -2,6 +2,8 @@ package com.api.freemarket.common.excption;
 
 import com.api.freemarket.common.CommonResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.mail.MailException;
+import org.springframework.mail.MailSendException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.ErrorResponse;
@@ -57,5 +59,13 @@ public class GlobalExceptionHandler {
         log.error("UsernameNotFoundException throw Exception : {}", MEMBER_STATUS_ERROR);
 
         return CommonResponse.ERROR(MEMBER_STATUS_ERROR.getHttpStatus(), ex.getMessage());
+    }
+
+    @ExceptionHandler(value = {MailSendException.class})
+    public CommonResponse handleMailSendException(MailSendException ex) {
+
+        log.error("MailSendException throw Exception : {}", MAIL_SEND_ERROR);
+
+        return CommonResponse.ERROR(MAIL_SEND_ERROR.getHttpStatus(), ex.getMessage());
     }
 }
