@@ -5,7 +5,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
-@Schema(name = "비밀번호 찾기 요청", description = "비밀번호 찾기용 요청 모델")
+@Schema(description = "비밀번호 찾기용 요청 모델")
 @Getter
 @Setter
 @ToString
