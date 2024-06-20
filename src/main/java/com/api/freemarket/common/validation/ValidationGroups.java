@@ -9,4 +9,6 @@ public class ValidationGroups {
     public interface addInfoValidation {}
     public interface findPasswordValidation {}
     public interface findIdValidation {}
+    public interface requestTempPasswordValidation {}
+    public interface requestFindIdValidation {}
 }

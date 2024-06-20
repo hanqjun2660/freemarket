@@ -367,7 +367,7 @@ public class AccountController {
     })
     @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(examples = {@ExampleObject(value = SwaggerAccountDesc.TEMP_PASSWORD_ISSUED_EX_VAL)}))
     @PostMapping("/find-password/temp-password")
-    public CommonResponse issuedTempPassword(@RequestBody @Validated({ValidationGroups.findPasswordValidation.class}) FindIdAndPwRequest request) {
+    public CommonResponse issuedTempPassword(@RequestBody @Validated({ValidationGroups.findPasswordValidation.class, ValidationGroups.requestTempPasswordValidation.class}) FindIdAndPwRequest request) {
 
         if(!"Y".equalsIgnoreCase(request.getVerify())) {
             return CommonResponse.ERROR("유효하지 않은 요청입니다.");
@@ -430,7 +430,11 @@ public class AccountController {
     })
     @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(examples = {@ExampleObject(value = SwaggerAccountDesc.FIND_ID_USER_INFO_EX_VAL)}))
     @PostMapping("/find-id/user-info")
-    public CommonResponse findIdUserInfo(@RequestBody @Validated({ValidationGroups.findIdValidation.class}) FindIdAndPwRequest request) {
+    public CommonResponse findIdUserInfo(@RequestBody @Validated({ValidationGroups.findIdValidation.class, ValidationGroups.requestFindIdValidation.class}) FindIdAndPwRequest request) {
+
+        if(!"Y".equalsIgnoreCase(request.getVerify())) {
+            return CommonResponse.ERROR("유효하지 않은 요청입니다.");
+        }
 
         String email = request.getEmail();
 
@@ -440,13 +444,17 @@ public class AccountController {
 
         if(userDTO.getProvider().isEmpty()){    // 일반 회원의 경우
             data.put("memberID", userDTO.getMemberId());
-            return CommonResponse.OK("회원가입이 정상 처리 되었습니다.",data);
         } else {                                // 소셜 로그인 경우
-            data.put("provider", userDTO.getProvider());
-            return CommonResponse.OK("회원가입이 정상 처리 되었습니다.",data);
+            switch (userDTO.getProvider()) {
+                case "kakao": data.put("provider", "카카오");
+                    break;
+                case "naver": data.put("provider", "네이버");
+                    break;
+                case "google": data.put("provider", "구글");
+                    break;
+            }
         }
-
-
+        return CommonResponse.OK("정상적으로 처리되었습니다.",data);
     }
 
 }
