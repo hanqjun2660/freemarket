@@ -92,10 +92,13 @@ public class Mailcontroller {
 
         try {
             redisCertNo = redisService.getValuesForString(request.getEmail());
+            if(redisCertNo == null) {
+                response.put("verify", "N");
+                return CommonResponse.ERROR("인증번호 발송 내역이 존재하지 않음", response);
+            }
         } catch (Exception e) {
             e.printStackTrace();
-            response.put("verify", "N");
-            return CommonResponse.ERROR("인증번호 발송 내역이 존재하지 않음", response);
+            return CommonResponse.ERROR("서버 내부오류 발생");
         }
 
         if(!request.getCertNo().equals(redisCertNo)) {
