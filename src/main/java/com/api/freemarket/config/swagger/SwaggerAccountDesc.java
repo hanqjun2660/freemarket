@@ -187,7 +187,8 @@ public final class SwaggerAccountDesc {
 
     public static final String FIND_ID_USER_INFO_EX_VAL = """
             {
-                "email":"asdf@asdf.com"
+                "email":"asdf@asdf.com",
+                "verify":"Y"
             }
             """;
 

@@ -22,7 +22,6 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -36,8 +35,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
 import java.time.Duration;
 import java.util.*;
 
@@ -442,7 +439,7 @@ public class AccountController {
 
         Map<String, Object> data = new HashMap<>();
 
-        if(userDTO.getProvider().isEmpty()){    // 일반 회원의 경우
+        if("site".equals(userDTO.getProvider())){    // 일반 회원의 경우
             data.put("memberID", userDTO.getMemberId());
         } else {                                // 소셜 로그인 경우
             switch (userDTO.getProvider()) {
