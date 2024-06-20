@@ -1,17 +1,16 @@
 package com.api.freemarket.domain.account.controller;
 
 import com.api.freemarket.common.CommonResponse;
+import com.api.freemarket.common.email.EmailUtil;
 import com.api.freemarket.common.jwt.JWTUtil;
 import com.api.freemarket.common.validation.ValidationGroups;
 import com.api.freemarket.config.swagger.SwaggerAccountDesc;
 import com.api.freemarket.config.swagger.SwaggerCommonDesc;
 import com.api.freemarket.domain.account.entity.User;
-import com.api.freemarket.domain.account.enums.RoleName;
-import com.api.freemarket.domain.account.model.PrincipalDetails;
-import com.api.freemarket.domain.account.model.RedisData;
-import com.api.freemarket.domain.account.model.UserDTO;
+import com.api.freemarket.domain.account.model.*;
 import com.api.freemarket.domain.account.service.RedisService;
 import com.api.freemarket.domain.account.service.UserService;
+import com.api.freemarket.domain.mail.service.MailService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
@@ -22,10 +21,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.util.ObjectUtils;
@@ -36,9 +36,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.Duration;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Optional;
+import java.util.*;
 
 @Tag(name="Account", description = "계정 관련 API")
 @RestController
@@ -53,13 +51,20 @@ public class AccountController {
     @Value("${spring.jwt.refresh-duration}")
     private Long refreshDuration;
 
+    @Value("${spring.mail.auth-code-expiration-millis}")
+    private long authCodeExpireationMillis;
+
     private final PasswordEncoder passwordEncoder;
 
     private final JWTUtil jwtUtil;
 
+    private final EmailUtil emailUtil;
+
     private final RedisService redisService;
 
     private final UserService userService;
+
+    private final MailService mailService;
 
     @Operation(summary = "로그인", description = SwaggerAccountDesc.NORMAL_USER_LOGIN_DESC)
     @ApiResponses(value = {
@@ -70,7 +75,7 @@ public class AccountController {
                     content = @Content(schema = @Schema(implementation = CommonResponse.class),
                     examples = @ExampleObject(value = SwaggerCommonDesc.RESPONSE_FAILED_DESC)))
     })
-    @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(examples = {@ExampleObject(description = SwaggerAccountDesc.NORMAL_USER_LOGIN_EX_DESC, value = SwaggerAccountDesc.NORMAL_USER_LOGIN_EX_VAL)}))
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(examples = {@ExampleObject(value = SwaggerAccountDesc.NORMAL_USER_LOGIN_EX_VAL)}))
     @PostMapping("/login")
     public CommonResponse login(@RequestBody @Validated({ValidationGroups.loginValidation.class}) UserDTO userDTO, HttpServletResponse response) {
 
@@ -214,21 +219,21 @@ public class AccountController {
                     content = @Content(schema = @Schema(implementation = CommonResponse.class),
                             examples = @ExampleObject(value = SwaggerCommonDesc.RESPONSE_FAILED_DESC)))
     })
-    @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(examples = {@ExampleObject(description = SwaggerAccountDesc.JOIN_EX_DESC, value = SwaggerAccountDesc.JOIN_EX_VAL)}))
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(examples = {@ExampleObject(value = SwaggerAccountDesc.JOIN_EX_VAL)}))
     @PostMapping("/join")
-    public CommonResponse join(@RequestBody @Validated({ValidationGroups.joinValidation.class}) UserDTO userDTO) {
+    public CommonResponse join(@RequestBody UserAndAddressDTO userAndAddressDTO) {
 
-        boolean existMemberId = userService.existsByMemberId(userDTO.getMemberId());
+        boolean existMemberId = userService.existsByMemberId(userAndAddressDTO.getUserDTO().getMemberId());
 
         if(existMemberId) {
             return CommonResponse.ERROR("해당 아이디를 사용하는 사용자가 존재합니다.", false);
         }
 
-        String encodePassword = passwordEncoder.encode(userDTO.getPassword());
-        userDTO.setPassword(encodePassword);
+        String encodePassword = passwordEncoder.encode(userAndAddressDTO.getUserDTO().getPassword());
+        userAndAddressDTO.getUserDTO().setPassword(encodePassword);
 
         // 사용자 정보 DB 저장
-        User joinUser = userService.joinUser(userDTO);
+        User joinUser = userService.joinUser(userAndAddressDTO.getUserDTO(), userAndAddressDTO.getAddressDTO());
         if(ObjectUtils.isEmpty(joinUser)) {
             CommonResponse.ERROR("회원가입 실패");
         }
@@ -240,48 +245,213 @@ public class AccountController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = SwaggerCommonDesc.RESPONSE_SUCCESS_CODE, description = SwaggerAccountDesc.CHECK_NICKNAME_SUCCESS_DESC,
                     content = @Content(schema = @Schema(implementation = CommonResponse.class),
-                            examples = @ExampleObject(value = SwaggerCommonDesc.RESPONSE_SUCCESS_DESC_DATA_TRUE))),
+                            examples = @ExampleObject(value = SwaggerCommonDesc.RESPONSE_SUCCESS_DESC))),
             @ApiResponse(responseCode = SwaggerCommonDesc.RESPONSE_FAILED_CODE, description = SwaggerAccountDesc.CHECK_NICKNAME_FAILED_DESC,
                     content = @Content(schema = @Schema(implementation = CommonResponse.class),
-                            examples = @ExampleObject(value = SwaggerCommonDesc.RESPONSE_FAILED_DESC_DATA_FALSE)))
+                            examples = @ExampleObject(value = SwaggerCommonDesc.RESPONSE_FAILED_DESC)))
     })
-    @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(examples = {@ExampleObject(description = SwaggerAccountDesc.CHECK_NICKNAME_EX_DESC, value = SwaggerAccountDesc.CHECK_NICKNAME_EX_VAL)}))
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(examples = {@ExampleObject(value = SwaggerAccountDesc.CHECK_NICKNAME_EX_VAL)}))
     @PostMapping("/check-nickname")
     public CommonResponse checkNickname(@RequestBody @Validated({ValidationGroups.NicknameValidation.class}) UserDTO userDTO) {
 
         boolean exists = userService.existsByNickname(userDTO.getNickname());
         if(exists) {
-            return CommonResponse.ERROR("해당 별명을 사용하는 사용자가 존재합니다.", !exists);
+            return CommonResponse.ERROR("해당 별명을 사용하는 사용자가 존재합니다.");
         } else {
-            return CommonResponse.OK("사용 가능한 별명입니다.", !exists);
+            return CommonResponse.OK("사용 가능한 별명입니다.");
         }
-
-
     }
 
     @Operation(summary = "아이디 중복 체크", description = SwaggerAccountDesc.MEMBER_ID_DESC)
     @ApiResponses(value = {
             @ApiResponse(responseCode = SwaggerCommonDesc.RESPONSE_SUCCESS_CODE, description = SwaggerAccountDesc.MEMBER_ID_SUCCESS_DESC,
                     content = @Content(schema = @Schema(implementation = CommonResponse.class),
-                            examples = @ExampleObject(value = SwaggerCommonDesc.RESPONSE_SUCCESS_DESC_DATA_TRUE))),
+                            examples = @ExampleObject(value = SwaggerCommonDesc.RESPONSE_SUCCESS_DESC))),
             @ApiResponse(responseCode = SwaggerCommonDesc.RESPONSE_FAILED_CODE, description = SwaggerAccountDesc.MEMBER_ID_FAILED_DESC,
                     content = @Content(schema = @Schema(implementation = CommonResponse.class),
-                            examples = @ExampleObject(value = SwaggerCommonDesc.RESPONSE_FAILED_DESC_DATA_FALSE)))
+                            examples = @ExampleObject(value = SwaggerCommonDesc.RESPONSE_FAILED_DESC)))
     })
-    @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(examples = {@ExampleObject(description = SwaggerAccountDesc.MEMBER_ID_EX_DESC, value = SwaggerAccountDesc.MEMBER_ID_EX_VAL)}))
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(examples = {@ExampleObject(value = SwaggerAccountDesc.MEMBER_ID_EX_VAL)}))
     @PostMapping("/check-id")
     public CommonResponse checkId(@RequestBody @Validated({ValidationGroups.memberIdValidation.class}) UserDTO userDTO) {
 
-        // 값이 넘어왔는지 체크
-        if(StringUtils.isEmpty(userDTO.getMemberId())) {
-            return CommonResponse.ERROR("별명을 입력해주세요.");
-        }
-
         boolean exists = userService.existsByMemberId(userDTO.getMemberId());
         if(exists) {
-            return CommonResponse.ERROR("해당 아이디를 사용하는 사용자가 존재합니다.", !exists);
+            return CommonResponse.ERROR("해당 아이디를 사용하는 사용자가 존재합니다.");
         } else {
-            return CommonResponse.OK("사용 가능한 아이디입니다.", !exists);
+            return CommonResponse.OK("사용 가능한 아이디입니다.");
         }
     }
+
+    @Operation(summary = "소셜 유저 회원가입", description = SwaggerAccountDesc.SOCIAL_USER_JOIN_DESC)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = SwaggerCommonDesc.RESPONSE_SUCCESS_CODE, description = SwaggerAccountDesc.SOCIAL_USER_JOIN_SUCCESS_DESC,
+                    content = @Content(schema = @Schema(implementation = CommonResponse.class),
+                            examples = @ExampleObject(value = SwaggerCommonDesc.RESPONSE_SUCCESS_DESC))),
+            @ApiResponse(responseCode = SwaggerCommonDesc.RESPONSE_FAILED_CODE, description = SwaggerAccountDesc.SOCIAL_USER_JOIN_FAILED_DESC,
+                    content = @Content(schema = @Schema(implementation = CommonResponse.class),
+                            examples = @ExampleObject(value = SwaggerCommonDesc.RESPONSE_FAILED_DESC)))
+    })
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(examples = {@ExampleObject(value = SwaggerAccountDesc.SOCIAL_USER_JOIN_EX_VAL)}))
+    @PostMapping("/social-user-join")
+    public CommonResponse socialUserJoin(@RequestBody UserAndAddressDTO userAndAddressDTO, HttpSession session) {
+        try {
+            PrincipalDetails principalDetails = (PrincipalDetails) session.getAttribute(PrincipalDetails.PRINCIPAL_SESSION_KEY);
+            String memberId = principalDetails.getMemberId();
+            String provider = principalDetails.getProvider();
+
+            UserDTO userDTO = userAndAddressDTO.getUserDTO();
+            AddressDTO addressDTO = userAndAddressDTO.getAddressDTO();
+
+            userDTO.setMemberId(memberId);
+            userDTO.setProvider(provider);
+
+            User joinUser = userService.joinUser(userDTO, addressDTO);
+
+            if(!ObjectUtils.isEmpty(joinUser)) {
+                return CommonResponse.OK("회원가입이 정상 처리 되었습니다.",null);
+            }
+
+            return CommonResponse.ERROR("회원가입이 정상적으로 처리되지 않았습니다.",null);
+        } catch (NullPointerException e) {
+            return CommonResponse.ERROR("정상적인 접근이 아닙니다.", null);
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+            return CommonResponse.ERROR("내부 서버 오류", null);
+        }
+    }
+
+    @Operation(summary = "비밀번호 찾기용 이메일 인증번호 발송", description = SwaggerAccountDesc.FIND_PASSWORD_CERT_DESC)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = SwaggerCommonDesc.RESPONSE_SUCCESS_CODE, description = SwaggerAccountDesc.FIND_PASSWORD_CERT_SUCCESS_DESC,
+                    content = @Content(schema = @Schema(implementation = CommonResponse.class),
+                            examples = @ExampleObject(value = SwaggerAccountDesc.FIND_PASSWORD_CERT_SUCCESS_EX_VAL))),
+            @ApiResponse(responseCode = SwaggerCommonDesc.RESPONSE_FAILED_CODE, description = SwaggerAccountDesc.FIND_PASSWORD_CERT_FAILED_DESC,
+                    content = @Content(schema = @Schema(implementation = CommonResponse.class),
+                            examples = @ExampleObject(value = SwaggerCommonDesc.RESPONSE_FAILED_DESC)))
+    })
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(examples = {@ExampleObject(value = SwaggerAccountDesc.FIND_PASSWORD_CERT_EX_VAL)}))
+    @PostMapping("/find-password/send-cert-num")
+    public CommonResponse findPassword(@RequestBody @Validated({ValidationGroups.findPasswordValidation.class}) FindIdAndPwRequest request) {
+
+        String title = "[인증번호] FreeMarket 이메일 인증번호 입니다.";
+        String certCode = emailUtil.createCode();
+
+        request.setEmailTitle(title);
+        request.setEmailText(certCode);
+
+        // 인증번호 메일 발송 후 확인용으로 redis에 저장
+        userService.existMemberIdAndEmail(request);
+
+        SimpleMailMessage emailForm = emailUtil.createEmailForm(request.getEmail(), title, "인증번호: " + certCode);
+        mailService.sendEmail(emailForm);
+        redisService.setValues(request.getEmail(), certCode, Duration.ofMillis(authCodeExpireationMillis));
+
+        Map<String, Long> response = new HashMap<>();
+        response.put("duration", authCodeExpireationMillis);
+
+        return CommonResponse.OK("인증번호가 발송되었습니다.", response);
+    }
+
+    @Operation(summary = "임시 비밀번호 발급", description = SwaggerAccountDesc.TEMP_PASSWORD_ISSUED_DESC)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = SwaggerCommonDesc.RESPONSE_SUCCESS_CODE, description = SwaggerAccountDesc.TEMP_PASSWORD_ISSUED_SUCCESS_DESC,
+                    content = @Content(schema = @Schema(implementation = CommonResponse.class),
+                            examples = @ExampleObject(value = SwaggerCommonDesc.RESPONSE_SUCCESS_DESC))),
+            @ApiResponse(responseCode = SwaggerCommonDesc.RESPONSE_FAILED_CODE, description = SwaggerAccountDesc.TEMP_PASSWORD_ISSUED_FAILED_DESC,
+                    content = @Content(schema = @Schema(implementation = CommonResponse.class),
+                            examples = @ExampleObject(value = SwaggerCommonDesc.RESPONSE_FAILED_DESC)))
+    })
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(examples = {@ExampleObject(value = SwaggerAccountDesc.TEMP_PASSWORD_ISSUED_EX_VAL)}))
+    @PostMapping("/find-password/temp-password")
+    public CommonResponse issuedTempPassword(@RequestBody @Validated({ValidationGroups.findPasswordValidation.class, ValidationGroups.requestTempPasswordValidation.class}) FindIdAndPwRequest request) {
+
+        if(!"Y".equalsIgnoreCase(request.getVerify())) {
+            return CommonResponse.ERROR("유효하지 않은 요청입니다.");
+        }
+
+        String title = "[임시 비밀번호] FreeMarket에서 임시 비밀번호를 발송드립니다.";
+        String tempPassword = emailUtil.createTempPassword();
+
+        userService.existMemberIdAndEmail(request);
+
+        SimpleMailMessage emailForm = emailUtil.createEmailForm(request.getEmail(), title, "임시 비밀번호: " + tempPassword);
+
+        mailService.sendEmail(emailForm);
+        userService.tempChangePassword(request.getMemberId(), passwordEncoder.encode(tempPassword));
+
+        return CommonResponse.OK("임시 비밀번호가 메일로 발송되었습니다.");
+    }
+
+    @Operation(summary = "아이디 찾기용 이메일 인증번호 발송", description = SwaggerAccountDesc.FIND_ID_CERT_DESC)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = SwaggerCommonDesc.RESPONSE_SUCCESS_CODE, description = SwaggerAccountDesc.FIND_ID_CERT_SUCCESS_DESC,
+                    content = @Content(schema = @Schema(implementation = CommonResponse.class),
+                            examples = @ExampleObject(value = SwaggerAccountDesc.FIND_ID_CERT_SUCCESS_EX_VAL))),
+            @ApiResponse(responseCode = SwaggerCommonDesc.RESPONSE_FAILED_CODE, description = SwaggerAccountDesc.FIND_ID_CERT_FAILED_DESC,
+                    content = @Content(schema = @Schema(implementation = CommonResponse.class),
+                            examples = @ExampleObject(value = SwaggerCommonDesc.RESPONSE_FAILED_DESC)))
+    })
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(examples = {@ExampleObject(value = SwaggerAccountDesc.FIND_ID_CERT_EX_VAL)}))
+    @PostMapping("/find-id/send-cert-num")
+    public CommonResponse findId(@RequestBody @Validated({ValidationGroups.findIdValidation.class}) FindIdAndPwRequest request) {
+
+        String title = "[인증번호] FreeMarket 이메일 인증번호 입니다.";
+        String certCode = emailUtil.createCode();
+
+        request.setEmailTitle(title);
+        request.setEmailText(certCode);
+
+        // 유저가 있는지 확인
+        userService.existsEmail(request);
+
+        // 인증번호 메일 발송 후 확인용으로 redis에 저장
+        SimpleMailMessage emailForm = emailUtil.createEmailForm(request.getEmail(), title, "인증번호: " + certCode);
+        mailService.sendEmail(emailForm);
+        redisService.setValues(request.getEmail(), certCode, Duration.ofMillis(authCodeExpireationMillis));
+
+        Map<String, Long> response = new HashMap<>();
+        response.put("duration", authCodeExpireationMillis);
+
+        return CommonResponse.OK("인증번호가 발송되었습니다.", response);
+    }
+
+    @Operation(summary = "아이디 찾기 정보(아이디/소셜로그인 정보)", description = SwaggerAccountDesc.FIND_ID_USER_INFO_DESC)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = SwaggerCommonDesc.RESPONSE_SUCCESS_CODE, description = SwaggerAccountDesc.FIND_ID_USER_INFO_SUCCESS_DESC,
+                    content = @Content(schema = @Schema(implementation = CommonResponse.class),
+                            examples = @ExampleObject(value = SwaggerAccountDesc.FIND_ID_USER_INFO_SUCCESS_EX_VAL))),
+            @ApiResponse(responseCode = SwaggerCommonDesc.RESPONSE_FAILED_CODE, description = SwaggerAccountDesc.FIND_ID_USER_INFO_FAILED_DESC,
+                    content = @Content(schema = @Schema(implementation = CommonResponse.class),
+                            examples = @ExampleObject(value = SwaggerCommonDesc.RESPONSE_FAILED_DESC)))
+    })
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(examples = {@ExampleObject(value = SwaggerAccountDesc.FIND_ID_USER_INFO_EX_VAL)}))
+    @PostMapping("/find-id/user-info")
+    public CommonResponse findIdUserInfo(@RequestBody @Validated({ValidationGroups.findIdValidation.class, ValidationGroups.requestFindIdValidation.class}) FindIdAndPwRequest request) {
+
+        if(!"Y".equalsIgnoreCase(request.getVerify())) {
+            return CommonResponse.ERROR("유효하지 않은 요청입니다.");
+        }
+
+        String email = request.getEmail();
+
+        UserDTO userDTO = userService.findByEmail(email);
+
+        Map<String, Object> data = new HashMap<>();
+
+        if("site".equals(userDTO.getProvider())){    // 일반 회원의 경우
+            data.put("memberID", userDTO.getMemberId());
+        } else {                                // 소셜 로그인 경우
+            switch (userDTO.getProvider()) {
+                case "kakao": data.put("provider", "카카오");
+                    break;
+                case "naver": data.put("provider", "네이버");
+                    break;
+                case "google": data.put("provider", "구글");
+                    break;
+            }
+        }
+        return CommonResponse.OK("정상적으로 처리되었습니다.",data);
+    }
+
 }

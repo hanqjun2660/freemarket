@@ -34,6 +34,7 @@ public enum ErrorCode {
 
     /* 500 INTERNAL_SERVER_ERROR : 서버 내부 오류 (DB연결 실패, 응답 실패 등) */
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부 오류가 발생했습니다"),
+    MAIL_SEND_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "메일 발송에 실패하였습니다."),
 
     /* 502 BAD_GATEWAY : 게이트웨이나 프록시 서버 역할을 하는 서버가 상류 서버로부터 잘못된 응답 */
     BAD_GATEWAY(HttpStatus.BAD_GATEWAY, "잘못된 게이트웨이 응답입니다"),

@@ -1,18 +1,26 @@
 package com.api.freemarket.domain.account.service;
 
 import com.api.freemarket.common.CommonResponse;
+import com.api.freemarket.common.email.EmailUtil;
+import com.api.freemarket.domain.account.entity.Address;
+import com.api.freemarket.domain.account.entity.QUser;
 import com.api.freemarket.domain.account.entity.Role;
 import com.api.freemarket.domain.account.entity.User;
 import com.api.freemarket.domain.account.enums.MemberStatus;
 import com.api.freemarket.domain.account.enums.RoleName;
-import com.api.freemarket.domain.account.model.PrincipalDetails;
-import com.api.freemarket.domain.account.model.RoleDTO;
-import com.api.freemarket.domain.account.model.UserDTO;
+import com.api.freemarket.domain.account.model.*;
+import com.api.freemarket.domain.account.repository.AddressRepository;
 import com.api.freemarket.domain.account.repository.RoleRepository;
 import com.api.freemarket.domain.account.repository.UserRepository;
+import com.api.freemarket.domain.mail.service.MailService;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.mail.MailException;
+import org.springframework.mail.MailSendException;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -31,6 +39,12 @@ public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
 
     private final RoleRepository roleRepository;
+
+    private final AddressRepository addressRepository;
+
+    private final EmailUtil emailUtil;
+
+    private final MailService mailService;
 
     @Override
     public UserDetails loadUserByUsername(String memberId) throws UsernameNotFoundException {
@@ -72,7 +86,7 @@ public class UserService implements UserDetailsService {
     */
 
     @Transactional
-    public User joinUser(UserDTO userDTO) {
+    public User joinUser(UserDTO userDTO, AddressDTO addressDTO) {
         User saveUser = userRepository.save(modelMapper.map(userDTO, User.class));
 
         RoleDTO roleDTO = new RoleDTO();
@@ -80,6 +94,9 @@ public class UserService implements UserDetailsService {
         roleDTO.setMemberNo(saveUser.getMemberNo());
 
         roleRepository.save(modelMapper.map(roleDTO, Role.class));
+
+        addressDTO.setMemberNo(saveUser.getMemberNo());
+        addressRepository.save(modelMapper.map(addressDTO, Address.class));
 
         return saveUser;
     }
@@ -90,5 +107,44 @@ public class UserService implements UserDetailsService {
 
     public boolean existsByMemberId(String memberId) {
         return userRepository.existsByMemberId(memberId);
+    }
+
+    @Transactional
+    public void existMemberIdAndEmail(FindIdAndPwRequest request) {
+        Optional<User> optionalUser = userRepository.existsByMemberIdAndEmail(request.getMemberId(), request.getEmail());
+
+        if(!optionalUser.isPresent()) {
+            throw new UsernameNotFoundException("해당 가입정보가 존재하지 않습니다.");
+        }
+    }
+
+    @Transactional
+    public void tempChangePassword(String memberId, String encodePassword) {
+        Optional<User> findUser = Optional.ofNullable(userRepository.findByMemberId(memberId));
+
+        if(!findUser.isPresent()) {
+            throw new UsernameNotFoundException("해당 회원이 존재하지 않습니다.");
+        }
+
+        findUser.get().setPassword(encodePassword);
+    }
+
+    public void existsEmail(FindIdAndPwRequest request) {
+        boolean userExists = userRepository.existsByEmail(request.getEmail());
+
+        // 값이 있으면 true, 없으면 false
+        if(!userExists) {
+            throw new UsernameNotFoundException("해당 가입정보가 존재하지 않습니다.");
+        }
+    }
+
+    public UserDTO findByEmail(String email) {
+        Optional<User> optionalUser = userRepository.findByEmail(email);
+
+        if(!optionalUser.isPresent()) {
+            throw new UsernameNotFoundException("해당 가입정보가 존재하지 않습니다.");
+        }
+
+        return modelMapper.map(optionalUser.get(), UserDTO.class);
     }
 }

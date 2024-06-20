@@ -1,6 +1,7 @@
 package com.api.freemarket.domain.mail.controller;
 
 import com.api.freemarket.common.CommonResponse;
+import com.api.freemarket.common.email.EmailUtil;
 import com.api.freemarket.config.swagger.SwaggerCommonDesc;
 import com.api.freemarket.config.swagger.SwaggerMailDesc;
 import com.api.freemarket.domain.account.service.RedisService;
@@ -18,15 +19,15 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
 import java.time.Duration;
-import java.util.Random;
+import java.util.HashMap;
+import java.util.Map;
 
 @Tag(name="Mail", description = "인증 번호 메일발송 및 검증")
 @RestController
@@ -34,6 +35,8 @@ import java.util.Random;
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/mail")
 public class Mailcontroller {
+
+    private final EmailUtil emailUtil;
 
     private final RedisService redisService;
 
@@ -55,10 +58,12 @@ public class Mailcontroller {
     @PostMapping("/send")
     public CommonResponse sendCodeToEmail(@RequestBody @Valid CertNumberSendRequest certNumberSendRequest) {
         String title = "[인증번호] FreeMarket 이메일 인증번호 입니다.";
-        String origincode = createCode();
+        String origincode = emailUtil.createCode();
         String authCode = "인증번호 : " + origincode;
 
-        mailService.sendEmail(certNumberSendRequest.getToEmail(), title, authCode);
+        SimpleMailMessage emailForm = emailUtil.createEmailForm(certNumberSendRequest.getToEmail(), title, "인증번호 : " + authCode);
+
+        mailService.sendEmail(emailForm);
 
         try {
             redisService.setValues(certNumberSendRequest.getToEmail(), origincode, Duration.ofMillis(authCodeExpireationMillis));
@@ -69,47 +74,40 @@ public class Mailcontroller {
         return CommonResponse.OK("메일 발송 성공");
     }
 
-    @Operation(summary = "인증번호 검증", description = "사용자가 입력한 인증번호와 발송된 인증번호 상호 검증 api")
+    @Operation(summary = "인증번호 검증", description = SwaggerMailDesc.VALID_MAIL_DESC)
     @ApiResponses(value = {
             @ApiResponse(responseCode = SwaggerCommonDesc.RESPONSE_SUCCESS_CODE, description = SwaggerMailDesc.VALID_MAIL_SUCCESS_DESC,
                     content = @Content(schema = @Schema(implementation = CommonResponse.class),
-                    examples = @ExampleObject(value = SwaggerCommonDesc.RESPONSE_SUCCESS_DESC))),
+                    examples = @ExampleObject(value = SwaggerMailDesc.VALID_MAIL_SUCCESS_EX_VAL))),
             @ApiResponse(responseCode = SwaggerCommonDesc.RESPONSE_FAILED_CODE, description = SwaggerMailDesc.VALID_MAIL_FALIED_DESC,
                     content = @Content(schema = @Schema(implementation = CommonResponse.class),
-                            examples = @ExampleObject(value = SwaggerCommonDesc.RESPONSE_FAILED_DESC)))
+                            examples = @ExampleObject(value = SwaggerMailDesc.VALID_MAIL_FALIED_EX_VAL)))
     })
     @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(examples = {@ExampleObject(description = SwaggerMailDesc.VALID_MAIL_NUMBER_EX_DESC, value = SwaggerMailDesc.VALID_MAIL_NUMBER_EX_VAL)}))
     @PostMapping("/valid-cert-num")
     public CommonResponse validCertNumer(@RequestBody @Valid VaildCertNumberRequest request) {
 
         String redisCertNo = "";
+        Map<String, String> response = new HashMap<>();
 
         try {
             redisCertNo = redisService.getValuesForString(request.getEmail());
+            if(redisCertNo == null) {
+                response.put("verify", "N");
+                return CommonResponse.ERROR("인증번호 발송 내역이 존재하지 않음", response);
+            }
         } catch (Exception e) {
             e.printStackTrace();
-            return CommonResponse.ERROR("인증번호 발송 내역이 존재하지 않음");
+            return CommonResponse.ERROR("서버 내부오류 발생");
         }
 
         if(!request.getCertNo().equals(redisCertNo)) {
-            return CommonResponse.ERROR("인증번호가 일치하지 않습니다.");
+            response.put("verify", "N");
+            return CommonResponse.ERROR("인증번호가 일치하지 않습니다.", response);
         }
 
-        return CommonResponse.OK(null);
-    }
+        response.put("verify", "Y");
 
-    private String createCode() {
-        int length = 8;
-        try {
-            Random random = SecureRandom.getInstanceStrong();
-            StringBuilder sb = new StringBuilder();
-            for(int i = 0; i < length; i++) {
-                sb.append(random.nextInt(10));
-            }
-            return sb.toString();
-        } catch (NoSuchAlgorithmException e) {
-            log.debug("createCode exception");
-            throw new RuntimeException(e);
-        }
+        return CommonResponse.OK(null, response);
     }
 }

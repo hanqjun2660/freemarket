@@ -57,7 +57,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         Optional<User> existUser = Optional.ofNullable(userRepository.findByMemberId(memberId));
 
         if(!existUser.isPresent()) {
-            User registUser = User.builder()
+           /* User registUser = User.builder()
                     .name(oAuth2Response.getName())
                     .email(oAuth2Response.getEmail())
                     .nickname(oAuth2Response.getName())
@@ -73,7 +73,14 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                     .build();
             Role role = roleRepository.save(insertRole);
             UserDTO userDTO = modelMapper.map(findUser, UserDTO.class);
-            userDTO.setRole(role.getName());
+            userDTO.setRole(role.getName());*/
+
+            UserDTO userDTO = new UserDTO();
+            userDTO.setMemberId(memberId);
+            userDTO.setName(oAuth2Response.getName());
+            userDTO.setEmail(oAuth2Response.getEmail());
+            userDTO.setProfileImg(oAuth2Response.getProfileImage());
+            userDTO.setProvider(oAuth2Response.getProvider());
 
             return new PrincipalDetails(userDTO, oAuth2User.getAttributes());
         } else {
