@@ -26,6 +26,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.Duration;
+import java.util.HashMap;
+import java.util.Map;
 
 @Tag(name="Mail", description = "인증 번호 메일발송 및 검증")
 @RestController
@@ -72,32 +74,37 @@ public class Mailcontroller {
         return CommonResponse.OK("메일 발송 성공");
     }
 
-    @Operation(summary = "인증번호 검증", description = "사용자가 입력한 인증번호와 발송된 인증번호 상호 검증 api")
+    @Operation(summary = "인증번호 검증", description = SwaggerMailDesc.VALID_MAIL_DESC)
     @ApiResponses(value = {
             @ApiResponse(responseCode = SwaggerCommonDesc.RESPONSE_SUCCESS_CODE, description = SwaggerMailDesc.VALID_MAIL_SUCCESS_DESC,
                     content = @Content(schema = @Schema(implementation = CommonResponse.class),
-                    examples = @ExampleObject(value = SwaggerCommonDesc.RESPONSE_SUCCESS_DESC))),
+                    examples = @ExampleObject(value = SwaggerMailDesc.VALID_MAIL_SUCCESS_EX_VAL))),
             @ApiResponse(responseCode = SwaggerCommonDesc.RESPONSE_FAILED_CODE, description = SwaggerMailDesc.VALID_MAIL_FALIED_DESC,
                     content = @Content(schema = @Schema(implementation = CommonResponse.class),
-                            examples = @ExampleObject(value = SwaggerCommonDesc.RESPONSE_FAILED_DESC)))
+                            examples = @ExampleObject(value = SwaggerMailDesc.VALID_MAIL_FALIED_EX_VAL)))
     })
     @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(examples = {@ExampleObject(description = SwaggerMailDesc.VALID_MAIL_NUMBER_EX_DESC, value = SwaggerMailDesc.VALID_MAIL_NUMBER_EX_VAL)}))
     @PostMapping("/valid-cert-num")
     public CommonResponse validCertNumer(@RequestBody @Valid VaildCertNumberRequest request) {
 
         String redisCertNo = "";
+        Map<String, String> response = new HashMap<>();
 
         try {
             redisCertNo = redisService.getValuesForString(request.getEmail());
         } catch (Exception e) {
             e.printStackTrace();
-            return CommonResponse.ERROR("인증번호 발송 내역이 존재하지 않음");
+            response.put("verify", "N");
+            return CommonResponse.ERROR("인증번호 발송 내역이 존재하지 않음", response);
         }
 
         if(!request.getCertNo().equals(redisCertNo)) {
-            return CommonResponse.ERROR("인증번호가 일치하지 않습니다.");
+            response.put("verify", "N");
+            return CommonResponse.ERROR("인증번호가 일치하지 않습니다.", response);
         }
 
-        return CommonResponse.OK(null);
+        response.put("verify", "Y");
+
+        return CommonResponse.OK(null, response);
     }
 }

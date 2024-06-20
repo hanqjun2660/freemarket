@@ -143,7 +143,8 @@ public final class SwaggerAccountDesc {
     public static final String TEMP_PASSWORD_ISSUED_EX_VAL = """
             {
                 "memberId":"아이디",
-                "email":"asdf@asdf.com"
+                "email":"asdf@asdf.com",
+                "verify":"Y"
             }
             """;
 

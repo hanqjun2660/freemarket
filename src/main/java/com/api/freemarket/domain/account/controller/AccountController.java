@@ -369,6 +369,10 @@ public class AccountController {
     @PostMapping("/find-password/temp-password")
     public CommonResponse issuedTempPassword(@RequestBody @Validated({ValidationGroups.findPasswordValidation.class}) FindIdAndPwRequest request) {
 
+        if(!"Y".equalsIgnoreCase(request.getVerify())) {
+            return CommonResponse.ERROR("유효하지 않은 요청입니다.");
+        }
+
         String title = "[임시 비밀번호] FreeMarket에서 임시 비밀번호를 발송드립니다.";
         String tempPassword = emailUtil.createTempPassword();
 

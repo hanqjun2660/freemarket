@@ -24,4 +24,7 @@ public class FindIdAndPwRequest {
     private String emailTitle;
 
     private String emailText;
+
+    @NotBlank(message = "이메일 인증이 되지 않았습니다.", groups = {ValidationGroups.findPasswordValidation.class})
+    private String verify;
 }
