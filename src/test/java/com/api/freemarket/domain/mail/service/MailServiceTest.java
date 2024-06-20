@@ -2,7 +2,6 @@ package com.api.freemarket.domain.mail.service;
 
 import com.api.freemarket.domain.account.entity.User;
 import com.api.freemarket.domain.account.model.FindIdAndPwRequest;
-import com.api.freemarket.domain.account.model.FindPasswordRequest;
 import com.api.freemarket.domain.account.repository.UserRepository;
 import com.api.freemarket.domain.account.service.UserService;
 import org.junit.jupiter.api.BeforeAll;
