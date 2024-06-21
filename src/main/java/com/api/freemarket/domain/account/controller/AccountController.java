@@ -453,5 +453,4 @@ public class AccountController {
         }
         return CommonResponse.OK("정상적으로 처리되었습니다.",data);
     }
-
 }

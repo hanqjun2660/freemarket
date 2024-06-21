@@ -87,6 +87,10 @@ public class PrincipalDetails implements OAuth2User, UserDetails {
     // OAuth2AuthorizedClient 클래스내에서 PrincipalName으로 사용됨
     @Override
     public String getUsername() {
+        if(attributes == null || attributes.get("id") == null) {
+            return String.valueOf(userDTO.getMemberNo());
+
+        }
         return String.valueOf(attributes.get("id"));
     }
 

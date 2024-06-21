@@ -72,7 +72,7 @@ public class SecurityConfig {
 
         // 경로별 인가(여기도 필요한거 추가해서 쓰자)
         http.authorizeHttpRequests((auth) -> auth
-                .requestMatchers("/logout").authenticated()
+                .requestMatchers("/api/v1/logout").authenticated()
                 .requestMatchers("/api/v1/account/**").permitAll()
                 .requestMatchers("/api/v1/mail/**").permitAll()
                 .anyRequest().permitAll());

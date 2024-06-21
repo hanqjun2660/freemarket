@@ -9,8 +9,8 @@ server:
 spring:
   jwt:
     secret: ENC(GJeIVh04lFNRkVsaNC72Rdm7lOFvjKte+khorLQdxW2Hcqc6pcHaiNi5OEDB/FX6kwNglto5TN/lpVQk9gIQkOhAdjOCycFq4j2n726IFAI=)
-    access-duration: 60000
-    refresh-duration: 86400000
+    access-duration: 1800000
+    refresh-duration: 604800000
 
   data:
     redis:

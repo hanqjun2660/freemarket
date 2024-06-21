@@ -211,4 +211,14 @@ public final class SwaggerAccountDesc {
             }
        }
        """;
+
+    // 로그아웃
+    public static final String LOGOUT_USER_DESC = """
+            로그아웃 요청을 처리하기 위한 API
+            - 로그아웃 요청시 만료되지 않은 accessToken이 필요함.
+            - 인증받은 사용자(로그인된 사용자)만 요청 가능 -> 상단 Authorize 버튼에 accessToken 입력 후 테스트가 가능
+            - 로그아웃이 성공적으로 처리되면 Authorize Header 및 Cookie내 refresh의 value는 null로 변경됨.
+            """;
+    public static final String LOGOUT_USER_SUCCESS_DESC="성공시 200코드 반환";
+    public static final String LOGOUT_USER_FAILED_DESC="성공시 500코드 반환";
 }

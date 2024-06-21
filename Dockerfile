@@ -15,7 +15,7 @@ COPY build.gradle .
 COPY settings.gradle .
 
 # Download dependencies and build the project
-RUN ./gradlew build
+#RUN ./gradlew build
 
 # Copy the compiled JAR file
 COPY build/libs/free_market_api.jar /app/
