@@ -27,9 +27,9 @@ public class CustomLogoutHandler implements LogoutSuccessHandler {
     public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         try {
             String accessToken = request.getHeader("Authorization");
-
+            log.info("accessToken : ", accessToken);
             String originToken = accessToken.substring(7);
-
+            log.info("originToken : ", originToken);
             Long key = jwtUtil.getUserNo(originToken);
 
             if(!redisService.checkExistsKey(String.valueOf(key))) {
