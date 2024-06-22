@@ -1,7 +1,5 @@
 server:
   port: 4544
-  ssl:
-    enabled: true
   servlet:
     encoding:
       charset: UTF-8
