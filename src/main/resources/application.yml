@@ -2,7 +2,6 @@ server:
   port: 4544
   ssl:
     enabled: true
-    redirect: true
   servlet:
     encoding:
       charset: UTF-8
