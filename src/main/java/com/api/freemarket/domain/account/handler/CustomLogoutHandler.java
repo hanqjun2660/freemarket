@@ -41,6 +41,7 @@ public class CustomLogoutHandler implements LogoutSuccessHandler {
             redisService.deleteValues(String.valueOf(key));
             response.setStatus(HttpStatus.OK.value());
         } catch (Exception e) {
+            e.printStackTrace();
             log.info("로그아웃 처리중 예외가 발생함");
             response.setStatus(HttpStatus.BAD_REQUEST.value());
         }
