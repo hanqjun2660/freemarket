@@ -30,7 +30,7 @@ public class LogoutController {
 
     private final RedisService redisService;
 
-    @Operation(summary = "로그아웃", description = SwaggerAccountDesc.LOGOUT_USER_DESC)
+    /*@Operation(summary = "로그아웃", description = SwaggerAccountDesc.LOGOUT_USER_DESC)
     @ApiResponses(value = {
             @ApiResponse(responseCode = SwaggerCommonDesc.RESPONSE_SUCCESS_CODE, description = SwaggerAccountDesc.LOGOUT_USER_SUCCESS_DESC,
                     content = @Content(schema = @Schema(implementation = CommonResponse.class),
@@ -64,10 +64,5 @@ public class LogoutController {
         response.addCookie(cookie);
         response.setHeader("Authorization", null);
         return CommonResponse.OK("정상적으로 로그아웃 처리 되었습니다.");
-    }
-
-    @PostMapping("/test")
-    public CommonResponse test() {
-        return CommonResponse.OK("성공");
-    }
+    }*/
 }
