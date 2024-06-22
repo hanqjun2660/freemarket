@@ -33,6 +33,7 @@ public class CustomLogoutHandler implements LogoutSuccessHandler {
             Long key = jwtUtil.getUserNo(originToken);
 
             if(!redisService.checkExistsKey(String.valueOf(key))) {
+                log.info("redis내에 해당하는 key에 대한 정보가 존재하지 않음");
                 response.setStatus(HttpStatus.BAD_REQUEST.value());
                 return;
             }
@@ -40,6 +41,7 @@ public class CustomLogoutHandler implements LogoutSuccessHandler {
             redisService.deleteValues(String.valueOf(key));
             response.setStatus(HttpStatus.OK.value());
         } catch (Exception e) {
+            log.info("로그아웃 처리중 예외가 발생함");
             response.setStatus(HttpStatus.BAD_REQUEST.value());
         }
     }
