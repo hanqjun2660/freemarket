@@ -13,6 +13,7 @@ import org.springframework.security.web.authentication.logout.LogoutSuccessHandl
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.Enumeration;
 
 @Component
 @Slf4j
@@ -26,8 +27,21 @@ public class CustomLogoutHandler implements LogoutSuccessHandler {
     @Override
     public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         try {
+            // Authorization Header가 잘 들어오는지 확인하기 위해 추가
+            Enumeration<String> headerNames = request.getHeaderNames();
+            while(headerNames.hasMoreElements()) {
+                String headerName = headerNames.nextElement();
+                log.info("Header: {} = {}", headerName, request.getHeader(headerName));
+            }
             String accessToken = request.getHeader("Authorization");
             log.info("accessToken : {}", accessToken);
+
+            if (accessToken == null || !accessToken.startsWith("Bearer ")) {
+                log.error("Invalid or missing Authorization header");
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid or missing Authorization header");
+                return;
+            }
+
             String originToken = accessToken.substring(7);
             log.info("originToken : {}", originToken);
             Long key = jwtUtil.getUserNo(originToken);
