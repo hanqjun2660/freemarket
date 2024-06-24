@@ -61,7 +61,7 @@ public class Mailcontroller {
         String origincode = emailUtil.createCode();
         String authCode = "인증번호 : " + origincode;
 
-        SimpleMailMessage emailForm = emailUtil.createEmailForm(certNumberSendRequest.getToEmail(), title, "인증번호 : " + authCode);
+        SimpleMailMessage emailForm = emailUtil.createEmailForm(certNumberSendRequest.getToEmail(), title, authCode);
 
         mailService.sendEmail(emailForm);
 

@@ -42,10 +42,6 @@ public class UserService implements UserDetailsService {
 
     private final AddressRepository addressRepository;
 
-    private final EmailUtil emailUtil;
-
-    private final MailService mailService;
-
     @Override
     public UserDetails loadUserByUsername(String memberId) throws UsernameNotFoundException {
         Optional<User> existUser = Optional.ofNullable(userRepository.findByMemberId(memberId));
