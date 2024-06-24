@@ -89,8 +89,9 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOriginPatterns(Arrays.asList("*"));        // front 서버 주소 나오면 수정해야함
         configuration.setAllowCredentials(true);
-        configuration.setAllowedHeaders(Arrays.asList("*"));        // 알맞게 수정해야함
+        configuration.setAllowedHeaders(Arrays.asList("authorization", "content-type", "x-auth-token"));        // 알맞게 수정해야함
         configuration.setAllowedMethods(Arrays.asList("*"));        // 알맞게 수정해야함
+        configuration.setExposedHeaders(Arrays.asList("set-cookie"));
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
