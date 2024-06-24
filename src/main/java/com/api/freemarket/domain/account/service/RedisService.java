@@ -71,7 +71,7 @@ public class RedisService {
     }
 
     public boolean checkExistsKey(String key) {
-        return redisTemplate.hasKey(key) != null;
+        return redisTemplate.hasKey(key);
     }
 
     /**
