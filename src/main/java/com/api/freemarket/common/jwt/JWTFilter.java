@@ -27,7 +27,12 @@ public class JWTFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         // header에 담긴 토큰 가져오기 AccessToken은 Authorization Header에 있음
-        String accessToken = request.getHeader("Authorization");
+        String accessToken = null;
+        if(request.getHeader("HTTP_AUTHORIZATION") != null) {
+            accessToken = request.getHeader("HTTP_AUTHORIZATION");
+        } else {
+            accessToken = request.getHeader("HTTP_AUTORIZATION");
+        }
         log.info("jwt filter Authorization header value: {}", accessToken);
 
         // 요청에 accessToken이 존재하는지 확인
