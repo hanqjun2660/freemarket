@@ -33,7 +33,7 @@ public class CustomLogoutHandler implements LogoutSuccessHandler {
                 String headerName = headerNames.nextElement();
                 log.info("Header: {} = {}", headerName, request.getHeader(headerName));
             }
-            String accessToken = request.getHeader("Authorization");
+            String accessToken = request.getHeader("Authorization1");
             log.info("accessToken : {}", accessToken);
 
             if (accessToken == null || !accessToken.startsWith("Bearer ")) {
