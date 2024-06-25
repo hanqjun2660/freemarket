@@ -94,6 +94,12 @@ public class AccountController {
 
         redisService.tokenWithInsertRedis(memberNo, role, response);
 
+        if("Y".equalsIgnoreCase(principalDetails.getTempPassStatus())) {
+            Map<String, String> dataMap = new HashMap<>();
+            dataMap.put("tempPassStatus", principalDetails.getTempPassStatus());
+            return CommonResponse.OK("임시 비밀번호를 발급받았습니다.", dataMap);
+        }
+
         return CommonResponse.OK(null);
     }
 
@@ -169,46 +175,6 @@ public class AccountController {
 
         return CommonResponse.OK("정상적으로 처리됨");
     }
-
-    /*
-    @Operation(summary = "추가 정보 입력(소셜 회원)", description = SwaggerAccountDesc.ADD_INFO_DESC)
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = SwaggerCommonDesc.RESPONSE_SUCCESS_CODE, description = SwaggerAccountDesc.NORMAL_USER_LOGIN_SUCCESS_DESC,
-                    content = @Content(schema = @Schema(implementation = CommonResponse.class),
-                            examples = @ExampleObject(value = SwaggerCommonDesc.RESPONSE_SUCCESS_DESC))),
-            @ApiResponse(responseCode = SwaggerCommonDesc.RESPONSE_FAILED_CODE, description = SwaggerAccountDesc.NORMAL_USER_LOGIN_FAILED_DESC,
-                    content = @Content(schema = @Schema(implementation = CommonResponse.class),
-                            examples = @ExampleObject(value = SwaggerCommonDesc.RESPONSE_FAILED_DESC)))
-    })
-    @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(examples = {@ExampleObject(description = SwaggerAccountDesc.ADD_INFO_EX_DESC, value = SwaggerAccountDesc.ADD_INFO_EX_VAL)}))
-    @PostMapping("/add-info")
-    public CommonResponse addInfo(@RequestBody @Validated({ValidationGroups.addInfoValidation.class}) UserDTO userDTO, HttpServletRequest request, HttpServletResponse response) {
-        Cookie[] cookies = request.getCookies();
-        long memberNo = 0L;
-
-        try {
-            for(Cookie cookie : cookies) {
-                if("memberNo".equals(cookie.getName())) {
-                    memberNo = Long.parseLong(cookie.getValue());
-                }
-            }
-        } catch (NullPointerException e) {
-            CommonResponse.ERROR("Cookie가 존재하지 않음");
-        }
-
-        User updateUser = userService.insertByMemberNo(userDTO, memberNo);
-
-        if(ObjectUtils.isEmpty(updateUser)) {
-            return CommonResponse.ERROR("해당 회원이 존재하지 않음");
-        }
-
-        String role = String.valueOf(RoleName.ROLE_USER);
-
-        redisService.tokenWithInsertRedis(memberNo, role, response);
-
-        return CommonResponse.OK("정상적으로 처리됨");
-    }
-    */
 
     @Operation(summary = "회원가입", description = SwaggerAccountDesc.JOIN_DESC)
     @ApiResponses(value = {
@@ -334,7 +300,7 @@ public class AccountController {
     @PostMapping("/find-password/send-cert-num")
     public CommonResponse findPassword(@RequestBody @Validated({ValidationGroups.findPasswordValidation.class}) FindIdAndPwRequest request) {
 
-        String title = "[인증번호] FreeMarket 이메일 인증번호 입니다.";
+        String title = "[인증번호] 나플나플 이메일 인증번호 입니다.";
         String certCode = emailUtil.createCode();
 
         request.setEmailTitle(title);
@@ -370,7 +336,7 @@ public class AccountController {
             return CommonResponse.ERROR("유효하지 않은 요청입니다.");
         }
 
-        String title = "[임시 비밀번호] FreeMarket에서 임시 비밀번호를 발송드립니다.";
+        String title = "[임시 비밀번호] 나플나플에서 임시 비밀번호를 발송드립니다.";
         String tempPassword = emailUtil.createTempPassword();
 
         userService.existMemberIdAndEmail(request);
@@ -396,7 +362,7 @@ public class AccountController {
     @PostMapping("/find-id/send-cert-num")
     public CommonResponse findId(@RequestBody @Validated({ValidationGroups.findIdValidation.class}) FindIdAndPwRequest request) {
 
-        String title = "[인증번호] FreeMarket 이메일 인증번호 입니다.";
+        String title = "[인증번호] 나플나플 이메일 인증번호 입니다.";
         String certCode = emailUtil.createCode();
 
         request.setEmailTitle(title);
@@ -451,6 +417,9 @@ public class AccountController {
                     break;
             }
         }
+
+        data.put("registDate", userDTO.getJoinDate());
+
         return CommonResponse.OK("정상적으로 처리되었습니다.",data);
     }
 }
