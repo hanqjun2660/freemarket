@@ -57,7 +57,7 @@ public class Mailcontroller {
     @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(examples = {@ExampleObject(description = SwaggerMailDesc.SEND_MAIL_EX_DESC, value = SwaggerMailDesc.SEND_MAIL_EX_VAL)}))
     @PostMapping("/send")
     public CommonResponse sendCodeToEmail(@RequestBody @Valid CertNumberSendRequest certNumberSendRequest) {
-        String title = "[인증번호] FreeMarket 이메일 인증번호 입니다.";
+        String title = "[인증번호] 나플나플 이메일 인증번호 입니다.";
         String origincode = emailUtil.createCode();
         String authCode = "인증번호 : " + origincode;
 

@@ -52,6 +52,9 @@ public class User {
     @Column(name = "member_id")
     private String memberId;
 
+    @Column(name = "temp_pass_issue")
+    private String tempPassIssue;
+
     @PrePersist
     public void prePersist() {
         if(status == null){
@@ -62,6 +65,9 @@ public class User {
         }
         if(provider == null) {
             this.provider = "site";
+        }
+        if(tempPassIssue == null) {
+            this.tempPassIssue = "N";
         }
     }
 

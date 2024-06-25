@@ -60,6 +60,10 @@ public class PrincipalDetails implements OAuth2User, UserDetails {
         return userDTO.getProvider();
     }
 
+    public String getTempPassStatus() {
+        return userDTO.getTempPassIssue();
+    }
+
     @Override
     public Map<String, Object> getAttributes() {
         return attributes;
