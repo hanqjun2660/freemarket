@@ -31,6 +31,10 @@ public class CommonResponse<T> {
         return new CommonResponse<T>(CommonResponseCode.OK, message, data);
     }
 
+    public static <T> CommonResponse<T> OK(CommonResponseCode statusCode, String message, T data) {
+        return new CommonResponse<T>(statusCode, message, data);
+    }
+
     public static <T> CommonResponse<T> ERROR(String message, T data) {
         return new CommonResponse<T>(CommonResponseCode.ERROR, message, data);
     }
@@ -46,6 +50,10 @@ public class CommonResponse<T> {
 
     public static CommonResponse OK(String message) {
         return OK(message, null);
+    }
+
+    public static CommonResponse OK(CommonResponseCode statusCode, String message) {
+        return OK(statusCode, message, null);
     }
 
     public static CommonResponse ERROR(String message) {

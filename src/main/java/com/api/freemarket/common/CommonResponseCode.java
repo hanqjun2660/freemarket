@@ -7,6 +7,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum CommonResponseCode {
     OK("200", "ok"),
+    REDIRECTION("300", "redirection"),
     ERROR("500", "error");
 
     private final String code;
