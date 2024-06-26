@@ -1,6 +1,7 @@
 package com.api.freemarket.domain.account.controller;
 
 import com.api.freemarket.common.CommonResponse;
+import com.api.freemarket.common.CommonResponseCode;
 import com.api.freemarket.common.email.EmailUtil;
 import com.api.freemarket.common.jwt.JWTUtil;
 import com.api.freemarket.common.validation.ValidationGroups;
@@ -97,7 +98,7 @@ public class AccountController {
         if("Y".equalsIgnoreCase(principalDetails.getTempPassStatus())) {
             Map<String, String> dataMap = new HashMap<>();
             dataMap.put("tempPassStatus", principalDetails.getTempPassStatus());
-            return CommonResponse.OK("임시 비밀번호를 발급받았습니다.", dataMap);
+            return CommonResponse.OK(CommonResponseCode.REDIRECTION, "임시 비밀번호를 발급받았습니다.", dataMap);
         }
 
         return CommonResponse.OK(null);
