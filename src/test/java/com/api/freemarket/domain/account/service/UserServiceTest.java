@@ -40,8 +40,6 @@ public class UserServiceTest {
         // Then: 조회된 User가 존재하며, memberId가 "1234qwer"인지 확인
         assertThat(fetchedUser).isNotNull();
         assertThat(fetchedUser.getMemberId()).isEqualTo("1234qwer");
-
-
     }
 
 }

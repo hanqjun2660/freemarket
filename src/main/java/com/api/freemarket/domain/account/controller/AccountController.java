@@ -301,8 +301,9 @@ public class AccountController {
     @PostMapping("/find-password/send-cert-num")
     public CommonResponse findPassword(@RequestBody @Validated({ValidationGroups.findPasswordValidation.class}) FindIdAndPwRequest request) {
 
-        String title = "[인증번호] 나플나플 이메일 인증번호 입니다.";
-        String certCode = emailUtil.createCode();
+        String title = "[인증번호] 나플나플에서 인증번호를 전달드립니다.";
+        String originCode = emailUtil.createCode();
+        String certCode = "인증번호: " + originCode;
 
         request.setEmailTitle(title);
         request.setEmailText(certCode);
@@ -310,14 +311,16 @@ public class AccountController {
         // 인증번호 메일 발송 후 확인용으로 redis에 저장
         userService.existMemberIdAndEmail(request);
 
-        SimpleMailMessage emailForm = emailUtil.createEmailForm(request.getEmail(), title, "인증번호: " + certCode);
-        mailService.sendEmail(emailForm);
-        redisService.setValues(request.getEmail(), certCode, Duration.ofMillis(authCodeExpireationMillis));
+        Map<String, String> dataMap = new HashMap<>();
+        dataMap.put("certNum", certCode);
+
+        mailService.sendTemplateEmail(title, request.getEmail(), dataMap);
+        redisService.setValues(request.getEmail(), originCode, Duration.ofMillis(authCodeExpireationMillis));
 
         Map<String, Long> response = new HashMap<>();
         response.put("duration", authCodeExpireationMillis);
 
-        return CommonResponse.OK("인증번호가 발송되었습니다.", response);
+        return CommonResponse.OK("메일 발송 성공", response);
     }
 
     @Operation(summary = "임시 비밀번호 발급", description = SwaggerAccountDesc.TEMP_PASSWORD_ISSUED_DESC)
