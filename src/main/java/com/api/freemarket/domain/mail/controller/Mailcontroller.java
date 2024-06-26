@@ -15,6 +15,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.mail.internet.MimeMessage;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -57,16 +58,19 @@ public class Mailcontroller {
     @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(examples = {@ExampleObject(description = SwaggerMailDesc.SEND_MAIL_EX_DESC, value = SwaggerMailDesc.SEND_MAIL_EX_VAL)}))
     @PostMapping("/send")
     public CommonResponse sendCodeToEmail(@RequestBody @Valid CertNumberSendRequest certNumberSendRequest) {
-        String title = "[인증번호] 나플나플 이메일 인증번호 입니다.";
+
+        String title = "[인증번호] 나플나플에서 인증번호를 전달드립니다.";
+        String toEmail = certNumberSendRequest.getToEmail();
         String origincode = emailUtil.createCode();
         String authCode = "인증번호 : " + origincode;
 
-        SimpleMailMessage emailForm = emailUtil.createEmailForm(certNumberSendRequest.getToEmail(), title, authCode);
+        Map<String, String> dataMap = new HashMap<>();
+        dataMap.put("certNum", authCode);
 
-        mailService.sendEmail(emailForm);
+        mailService.sendTemplateEmail(title, toEmail, dataMap);
 
         try {
-            redisService.setValues(certNumberSendRequest.getToEmail(), origincode, Duration.ofMillis(authCodeExpireationMillis));
+            redisService.setValues(toEmail, origincode, Duration.ofMillis(authCodeExpireationMillis));
         } catch (Exception e) {
             log.info("mail controller exception");
             e.printStackTrace();

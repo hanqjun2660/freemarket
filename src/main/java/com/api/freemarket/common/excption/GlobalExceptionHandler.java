@@ -1,6 +1,7 @@
 package com.api.freemarket.common.excption;
 
 import com.api.freemarket.common.CommonResponse;
+import jakarta.mail.MessagingException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.MailException;
 import org.springframework.mail.MailSendException;
@@ -65,6 +66,13 @@ public class GlobalExceptionHandler {
     public CommonResponse handleMailSendException(MailSendException ex) {
 
         log.error("MailSendException throw Exception : {}", MAIL_SEND_ERROR);
+
+        return CommonResponse.ERROR(MAIL_SEND_ERROR.getHttpStatus(), ex.getMessage());
+    }
+
+    @ExceptionHandler(value = {MessagingException.class})
+    public CommonResponse handleMessagingException(MessagingException ex) {
+        log.error("MessagingException throw Exception : {}", MESSAGING_SETTING_ERROR);
 
         return CommonResponse.ERROR(MAIL_SEND_ERROR.getHttpStatus(), ex.getMessage());
     }
