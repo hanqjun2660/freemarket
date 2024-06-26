@@ -98,7 +98,7 @@ public class AccountController {
         if("Y".equalsIgnoreCase(principalDetails.getTempPassStatus())) {
             Map<String, String> dataMap = new HashMap<>();
             dataMap.put("tempPassStatus", principalDetails.getTempPassStatus());
-            return CommonResponse.OK(CommonResponseCode.REDIRECTION, "임시 비밀번호를 발급받았습니다.", dataMap);
+            return CommonResponse.OK(CommonResponseCode.REDIRECTION, "임시 비밀번호를 발급 받았습니다.\n비밀번호 변경 페이지로 이동합니다.", dataMap);
         }
 
         return CommonResponse.OK(null);
