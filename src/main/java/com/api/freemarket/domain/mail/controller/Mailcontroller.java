@@ -60,11 +60,15 @@ public class Mailcontroller {
     public CommonResponse sendCodeToEmail(@RequestBody @Valid CertNumberSendRequest certNumberSendRequest) {
 
         String title = "[인증번호] 나플나플에서 인증번호를 전달드립니다.";
+        String bodyTitle = "안녕하세요. 나플나플 인증번호 입니다.";
+        String bodyText = "아래 인증번호를 입력하여 진행해주세요.";
         String toEmail = certNumberSendRequest.getToEmail();
         String origincode = emailUtil.createCode();
         String authCode = "인증번호 : " + origincode;
 
         Map<String, String> dataMap = new HashMap<>();
+        dataMap.put("bodyTitle", bodyTitle);
+        dataMap.put("bodyText", bodyText);
         dataMap.put("certNum", authCode);
 
         mailService.sendTemplateEmail(title, toEmail, dataMap);

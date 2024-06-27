@@ -36,6 +36,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.util.*;
 
@@ -71,7 +72,7 @@ public class AccountController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = SwaggerCommonDesc.RESPONSE_SUCCESS_CODE, description = SwaggerAccountDesc.NORMAL_USER_LOGIN_SUCCESS_DESC,
                     content = @Content(schema = @Schema(implementation = CommonResponse.class),
-                    examples = @ExampleObject(value = SwaggerCommonDesc.RESPONSE_SUCCESS_DESC))),
+                    examples = @ExampleObject(value = SwaggerAccountDesc.NORMAL_USER_LOGIN_SUCCESS_EX_VAL))),
             @ApiResponse(responseCode = SwaggerCommonDesc.RESPONSE_FAILED_CODE, description = SwaggerAccountDesc.NORMAL_USER_LOGIN_FAILED_DESC,
                     content = @Content(schema = @Schema(implementation = CommonResponse.class),
                     examples = @ExampleObject(value = SwaggerCommonDesc.RESPONSE_FAILED_DESC)))
@@ -302,6 +303,8 @@ public class AccountController {
     public CommonResponse findPassword(@RequestBody @Validated({ValidationGroups.findPasswordValidation.class}) FindIdAndPwRequest request) {
 
         String title = "[인증번호] 나플나플에서 인증번호를 전달드립니다.";
+        String bodyTitle = "안녕하세요. 나플나플 인증번호 입니다.";
+        String bodyText = "아래 인증번호를 입력하여 진행해주세요.";
         String originCode = emailUtil.createCode();
         String certCode = "인증번호: " + originCode;
 
@@ -312,6 +315,8 @@ public class AccountController {
         userService.existMemberIdAndEmail(request);
 
         Map<String, String> dataMap = new HashMap<>();
+        dataMap.put("bodyTitle", bodyTitle);
+        dataMap.put("bodyText", bodyText);
         dataMap.put("certNum", certCode);
 
         mailService.sendTemplateEmail(title, request.getEmail(), dataMap);
@@ -341,13 +346,19 @@ public class AccountController {
         }
 
         String title = "[임시 비밀번호] 나플나플에서 임시 비밀번호를 발송드립니다.";
+        String bodyTitle = "안녕하세요. 임시 비밀번호를 전달드립니다.";
+        String bodyText = "아래의 임시 비밀번호를 이용해 로그인 해주세요.\n 로그인 후 비밀번호를 꼭 변경해주세요.";
         String tempPassword = emailUtil.createTempPassword();
 
         userService.existMemberIdAndEmail(request);
 
-        SimpleMailMessage emailForm = emailUtil.createEmailForm(request.getEmail(), title, "임시 비밀번호: " + tempPassword);
+        Map<String, String> dataMap = new HashMap<>();
+        dataMap.put("bodyTitle", bodyTitle);
+        dataMap.put("bodyText", bodyText);
+        dataMap.put("tempPassword", "임시 비밀번호 : " + tempPassword);
 
-        mailService.sendEmail(emailForm);
+        mailService.sendTemplateEmail(title, request.getEmail(), dataMap);
+
         userService.tempChangePassword(request.getMemberId(), passwordEncoder.encode(tempPassword));
 
         return CommonResponse.OK("임시 비밀번호가 메일로 발송되었습니다.");
@@ -366,7 +377,9 @@ public class AccountController {
     @PostMapping("/find-id/send-cert-num")
     public CommonResponse findId(@RequestBody @Validated({ValidationGroups.findIdValidation.class}) FindIdAndPwRequest request) {
 
-        String title = "[인증번호] 나플나플 이메일 인증번호 입니다.";
+        String title = "[인증번호] 나플나플에서 인증번호를 전달드립니다.";
+        String bodyTitle = "안녕하세요. 나플나플 인증번호 입니다.";
+        String bodyText = "아래 인증번호를 입력하여 진행해주세요.";
         String certCode = emailUtil.createCode();
 
         request.setEmailTitle(title);
@@ -375,9 +388,13 @@ public class AccountController {
         // 유저가 있는지 확인
         userService.existsEmail(request);
 
+        Map<String, String> dataMap = new HashMap<>();
+        dataMap.put("bodyTitle", bodyTitle);
+        dataMap.put("bodyText", bodyText);
+        dataMap.put("certNum", "인증번호: " + certCode);
+
         // 인증번호 메일 발송 후 확인용으로 redis에 저장
-        SimpleMailMessage emailForm = emailUtil.createEmailForm(request.getEmail(), title, "인증번호: " + certCode);
-        mailService.sendEmail(emailForm);
+        mailService.sendTemplateEmail(title, request.getEmail(), dataMap);
         redisService.setValues(request.getEmail(), certCode, Duration.ofMillis(authCodeExpireationMillis));
 
         Map<String, Long> response = new HashMap<>();
@@ -422,7 +439,10 @@ public class AccountController {
             }
         }
 
-        data.put("registDate", userDTO.getJoinDate());
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        String registDate = dateFormat.format(userDTO.getJoinDate());
+
+        data.put("registDate", registDate);
 
         return CommonResponse.OK("정상적으로 처리되었습니다.",data);
     }

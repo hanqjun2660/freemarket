@@ -16,6 +16,26 @@ public final class SwaggerAccountDesc {
             }
             """;
 
+    public static final String NORMAL_USER_LOGIN_SUCCESS_EX_VAL = """
+       {
+            "로그인 시" : {
+                "statusCode": "200",
+                "httpStatus": null,
+                "message": null,
+                "data": null
+            },
+            
+            "임시 비밀번호 발급 회원 로그인 시" : {
+                "statusCode": "200",
+                "httpStatus": null,
+                "message": "임시 비밀번호를 발급 받았습니다. 비밀번호 변경 페이지로 이동합니다.",
+                "data": {
+                    "tempPassStatus" : "Y"
+                }
+            }
+       }
+       """;
+
     // 토큰 재발급
     public static final String TOKEN_REISSUE_DESC = "accessToken이 만료되었을때 Token 재발급을 위한 API, Cookie내 RefreshToken 필수";
 
