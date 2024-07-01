@@ -427,7 +427,7 @@ public class AccountController {
         Map<String, Object> data = new HashMap<>();
 
         if("site".equals(userDTO.getProvider())){    // 일반 회원의 경우
-            data.put("memberID", userDTO.getMemberId());
+            data.put("memberID", replacingMiddleLettersOfMemberId(userDTO.getMemberId()));
         } else {                                // 소셜 로그인 경우
             switch (userDTO.getProvider()) {
                 case "kakao": data.put("provider", "카카오");
@@ -445,5 +445,25 @@ public class AccountController {
         data.put("registDate", registDate);
 
         return CommonResponse.OK("정상적으로 처리되었습니다.",data);
+    }
+
+    /**
+     * 아이디 찾기시 중간 3글자 '*'로 치환하는 메서드
+     * @param text 아이디
+     * @return 치환된 아이디
+     */
+    public String replacingMiddleLettersOfMemberId(String text) {
+        // 3글자 이하면 변환 안함
+        if(text.length() < 3) {
+            return text;
+        }
+
+        int mid = text.length() / 2;
+
+        if(text.length() % 2 == 0) {        // 짝수인 경우
+            return text.substring(0, mid - 1) + "***" + text.substring(mid + 2);
+        } else {        // 홀수인 경우
+            return text.substring(0, mid - 1) + "***" + text.substring(mid + 2);
+        }
     }
 }
