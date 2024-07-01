@@ -226,7 +226,7 @@ public final class SwaggerAccountDesc {
                 "statusCode": "200",
                 "message": "성공메세지",
                 "data": {
-                    "memberId" : "test12345"
+                    "memberId" : "test***45"
                 }
             }
        }
