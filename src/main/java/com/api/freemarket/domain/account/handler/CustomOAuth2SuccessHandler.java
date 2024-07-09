@@ -7,18 +7,20 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
-import org.springframework.util.StringUtils;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Iterator;
 
 @Component
+@Slf4j
 @RequiredArgsConstructor
 public class CustomOAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
@@ -26,11 +28,13 @@ public class CustomOAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHa
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
-                                        Authentication authentication) {
+                                        Authentication authentication) throws IOException {
 
         HttpSession session = request.getSession();
 
         PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
+
+        log.info("oAuth data: {}", principalDetails.getAttributes());
 
         if(ObjectUtils.isEmpty(principalDetails.getMemberNo())) {
             // 소셜로 회원가입 진행해야하는 경우
