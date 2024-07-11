@@ -41,7 +41,6 @@ public class CustomOAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHa
             session.setAttribute(principalDetails.PRINCIPAL_SESSION_KEY , principalDetails);
             /*response.addCookie(new Cookie("email", principalDetails.getEmail()));*/
             Cookie emailCookie = new Cookie("email", principalDetails.getEmail());
-            emailCookie.setDomain("front.devsj.site");  // 쿠키를 사용할 도메인 설정
             emailCookie.setPath("/");  // 쿠키의 유효 경로 설정
             emailCookie.setHttpOnly(false);  // JavaScript에서 쿠키 접근 가능 여부
             emailCookie.setSecure(true);  // SameSite=None을 사용하려면 Secure도 true로 설정해야 함
@@ -55,14 +54,13 @@ public class CustomOAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHa
                     "email=%s; Max-Age=%d; Domain=%s; Path=%s; HttpOnly; Secure; SameSite=None",
                     principalDetails.getEmail(),
                     60 * 60,
-                    "front.devsj.site",
                     "/"
             );
             response.addHeader("Set-Cookie", cookieHeader);
 
             response.setStatus(HttpStatus.FOUND.value());
             response.sendRedirect("https://front.devsj.site");
-            
+
             return;
         }
 
