@@ -39,8 +39,6 @@ public class CustomOAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHa
         if(ObjectUtils.isEmpty(principalDetails.getMemberNo())) {
             // 소셜로 회원가입 진행해야하는 경우
             session.setAttribute(principalDetails.PRINCIPAL_SESSION_KEY , principalDetails);
-            response.setStatus(HttpStatus.FOUND.value());
-            response.sendRedirect("https://front.devsj.site");
             /*response.addCookie(new Cookie("email", principalDetails.getEmail()));*/
             Cookie emailCookie = new Cookie("email", principalDetails.getEmail());
             emailCookie.setDomain("front.devsj.site");  // 쿠키를 사용할 도메인 설정
@@ -61,6 +59,10 @@ public class CustomOAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHa
                     "/"
             );
             response.addHeader("Set-Cookie", cookieHeader);
+
+            response.setStatus(HttpStatus.FOUND.value());
+            response.sendRedirect("https://front.devsj.site");
+            
             return;
         }
 
