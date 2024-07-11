@@ -40,18 +40,19 @@ public class CustomOAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHa
             // 소셜로 회원가입 진행해야하는 경우
             session.setAttribute(principalDetails.PRINCIPAL_SESSION_KEY , principalDetails);
             /*response.addCookie(new Cookie("email", principalDetails.getEmail()));*/
+            // 쿠키 설정 - sendRedirect 이전에 설정해야 합니다.
             Cookie emailCookie = new Cookie("email", principalDetails.getEmail());
             emailCookie.setPath("/");  // 쿠키의 유효 경로 설정
             emailCookie.setHttpOnly(false);  // JavaScript에서 쿠키 접근 가능 여부
             emailCookie.setSecure(true);  // SameSite=None을 사용하려면 Secure도 true로 설정해야 함
             emailCookie.setMaxAge(60 * 60);  // 쿠키 유효 기간 설정 (1시간)
 
-            // 쿠키를 응답에 추가
+            // 도메인 설정을 제거하여 현재 호스트에 쿠키를 설정
             response.addCookie(emailCookie);
 
             // SameSite=None 속성을 추가하기 위해 헤더를 수동으로 설정
             String cookieHeader = String.format(
-                    "email=%s; Max-Age=%d; Domain=%s; Path=%s; HttpOnly; Secure; SameSite=None",
+                    "email=%s; Max-Age=%d; Path=%s; HttpOnly; Secure; SameSite=None",
                     principalDetails.getEmail(),
                     60 * 60,
                     "/"
