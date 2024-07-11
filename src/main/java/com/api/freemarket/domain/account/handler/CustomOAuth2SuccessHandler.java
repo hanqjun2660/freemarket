@@ -40,6 +40,7 @@ public class CustomOAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHa
             // 소셜로 회원가입 진행해야하는 경우
             session.setAttribute(principalDetails.PRINCIPAL_SESSION_KEY , principalDetails);
             response.setStatus(HttpStatus.FOUND.value());
+            response.sendRedirect("http://localhost:3000");
             response.addCookie(new Cookie("email", principalDetails.getEmail()));
             return;
         }
