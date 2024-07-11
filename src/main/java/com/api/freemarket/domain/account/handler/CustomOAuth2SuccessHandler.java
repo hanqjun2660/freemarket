@@ -42,7 +42,7 @@ public class CustomOAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHa
             /*response.addCookie(new Cookie("email", principalDetails.getEmail()));*/
             // 쿠키 설정 - sendRedirect 이전에 설정해야 합니다.
             Cookie emailCookie = new Cookie("email", principalDetails.getEmail());
-            emailCookie.setDomain(".devsj.site");  // 공통 도메인 설정
+            emailCookie.setDomain("devsj.site");  // 공통 도메인 설정
             emailCookie.setPath("/");  // 쿠키의 유효 경로 설정
             emailCookie.setHttpOnly(false);  // JavaScript에서 쿠키 접근 가능 여부
             emailCookie.setSecure(true);  // SameSite=None을 사용하려면 Secure도 true로 설정해야 함
@@ -57,7 +57,7 @@ public class CustomOAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHa
                     principalDetails.getEmail(),
                     60 * 60,
                     "/",
-                    ".devsj.site"
+                    "devsj.site"
             );
             response.addHeader("Set-Cookie", cookieHeader);
 
