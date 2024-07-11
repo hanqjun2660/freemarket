@@ -41,7 +41,28 @@ public class CustomOAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHa
             session.setAttribute(principalDetails.PRINCIPAL_SESSION_KEY , principalDetails);
             response.setStatus(HttpStatus.FOUND.value());
             response.sendRedirect("http://localhost:3000");
-            response.addCookie(new Cookie("email", principalDetails.getEmail()));
+            /*response.addCookie(new Cookie("email", principalDetails.getEmail()));*/
+            Cookie emailCookie = new Cookie("email", principalDetails.getEmail());
+            emailCookie.setDomain("localhost");  // 쿠키를 사용할 도메인 설정
+            emailCookie.setPath("/");  // 쿠키의 유효 경로 설정
+            emailCookie.setHttpOnly(false);  // JavaScript에서 쿠키 접근 가능 여부
+            emailCookie.setSecure(true);  // SameSite=None을 사용하려면 Secure도 true로 설정해야 함
+            emailCookie.setMaxAge(60 * 60);  // 쿠키 유효 기간 설정 (1시간)
+
+            // 쿠키를 응답에 추가
+            response.addCookie(emailCookie);
+
+            // SameSite=None 속성을 추가하기 위해 헤더를 수동으로 설정
+            String cookieHeader = String.format(
+                    "email=%s; Max-Age=%d; Domain=%s; Path=%s; HttpOnly=%b; Secure=%b; SameSite=None",
+                    principalDetails.getEmail(),
+                    60 * 60,
+                    "localhost",
+                    "/",
+                    false,
+                    true
+            );
+            response.addHeader("Set-Cookie", cookieHeader);
             return;
         }
 
