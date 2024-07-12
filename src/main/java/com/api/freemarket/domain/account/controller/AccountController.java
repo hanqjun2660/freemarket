@@ -276,6 +276,9 @@ public class AccountController {
 
             User joinUser = userService.joinUser(userDTO, addressDTO);
 
+            log.info("social join principal: {}", principalDetails.getAttributes());
+            log.info("social join userDTO: {}", userDTO.toString());
+
             if(!ObjectUtils.isEmpty(joinUser)) {
                 return CommonResponse.OK("회원가입이 정상 처리 되었습니다.",null);
             }
