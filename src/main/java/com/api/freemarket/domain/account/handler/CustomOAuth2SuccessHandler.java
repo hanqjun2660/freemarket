@@ -41,14 +41,14 @@ public class CustomOAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHa
             session.setAttribute(principalDetails.PRINCIPAL_SESSION_KEY , principalDetails);
             /*response.addCookie(new Cookie("email", principalDetails.getEmail()));*/
 
-            String origin = request.getHeader("Origin");
+            String referer = request.getHeader("Referer");
             String cookieDomain = "devsj.site";
 
-            if(origin != null && origin.contains("localhost")) {
+            if(referer != null && referer.contains("localhost")) {
                 cookieDomain = "localhost";
             }
 
-            log.info("origin: {}", origin);
+            log.info("origin: {}", referer);
             log.info("cookieDomain: {}", cookieDomain);
 
             // 쿠키 설정 - sendRedirect 이전에 설정해야 합니다.
