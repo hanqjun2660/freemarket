@@ -48,7 +48,8 @@ public class CustomOAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHa
                 cookieDomain = "localhost";
             }
 
-            log.info("origin: {}", cookieDomain);
+            log.info("origin: {}", origin);
+            log.info("cookieDomain: {}", cookieDomain);
 
             // 쿠키 설정 - sendRedirect 이전에 설정해야 합니다.
             Cookie emailCookie = new Cookie("email", principalDetails.getEmail());
@@ -71,6 +72,9 @@ public class CustomOAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHa
             );
             response.addHeader("Set-Cookie", cookieHeader);
 
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+            response.getWriter().write("{\"status\": \"success\"}");
             response.setStatus(HttpStatus.FOUND.value());
 
             return;
