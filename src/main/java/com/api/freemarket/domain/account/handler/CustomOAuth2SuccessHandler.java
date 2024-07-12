@@ -53,7 +53,7 @@ public class CustomOAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHa
 
             // SameSite=None 속성을 추가하기 위해 헤더를 수동으로 설정
             String cookieHeader = String.format(
-                    "email=%s; Max-Age=%d; Path=%s; Domain=%s; HttpOnly; Secure; SameSite=None",
+                    "email=%s; Max-Age=%d; Path=%s; Domain=%s; Secure; SameSite=None",
                     principalDetails.getEmail(),
                     60 * 60,
                     "/",
@@ -62,7 +62,6 @@ public class CustomOAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHa
             response.addHeader("Set-Cookie", cookieHeader);
 
             response.setStatus(HttpStatus.FOUND.value());
-            response.sendRedirect("https://front.devsj.site");
 
             return;
         }
