@@ -48,6 +48,8 @@ public class CustomOAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHa
                 cookieDomain = "localhost";
             }
 
+            log.info("origin: {}", cookieDomain);
+
             // 쿠키 설정 - sendRedirect 이전에 설정해야 합니다.
             Cookie emailCookie = new Cookie("email", principalDetails.getEmail());
             emailCookie.setDomain(cookieDomain);  // 공통 도메인 설정
