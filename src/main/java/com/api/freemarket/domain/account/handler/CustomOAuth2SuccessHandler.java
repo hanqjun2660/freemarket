@@ -16,8 +16,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 
 import java.io.IOException;
-import java.util.Collection;
-import java.util.Iterator;
+import java.util.*;
 
 @Component
 @Slf4j
@@ -40,6 +39,18 @@ public class CustomOAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHa
             // 소셜로 회원가입 진행해야하는 경우
             session.setAttribute(principalDetails.PRINCIPAL_SESSION_KEY , principalDetails);
             /*response.addCookie(new Cookie("email", principalDetails.getEmail()));*/
+
+            // HttpServletRequest에 있는 헤더를 모두 출력
+            Map<String, String> headers = new HashMap<>();
+
+            Enumeration<String> headerNames = request.getHeaderNames();
+            while(headerNames.hasMoreElements()) {
+                String headerName = headerNames.nextElement();
+                String headerValue = request.getHeader(headerName);
+                headers.put(headerName, headerValue);
+
+                log.info(String.format("Header '%s' = %s", headerName, headerValue));
+            }
 
             String origin = request.getHeader("Origin");
             String cookieDomain = "devsj.site";
