@@ -52,7 +52,7 @@ public class CustomOAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHa
                 log.info(String.format("Header '%s' = %s", headerName, headerValue));
             }
 
-            String origin = request.getHeader("Origin");
+            String origin = request.getHeader("origin");
             String cookieDomain = "devsj.site";
 
             if(origin != null && origin.contains("localhost")) {
