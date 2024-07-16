@@ -103,25 +103,16 @@ public final class SwaggerAccountDesc {
     public static final String SOCIAL_USER_JOIN_DESC = """
     소셜 로그인 유저 회원가입 시 추가정보 저장 API
     - 소셜로그인 성공 시 쿠키에 email 값을 넣어줌(화면 input에 고정으로 입력 후 해당 값도 같이 전달) 
-    - userDTO (이름, 별명, 휴대폰 번호, 이메일) / addressDTO(시,도 / 시,군,구 / 동,읍,면) JSON으로 전달
+    - userDTO (이메일, 닉네임)
     """;
     public static final String SOCIAL_USER_JOIN_SUCCESS_DESC = "성공시 200코드 반환";
     public static final String SOCIAL_USER_JOIN_FAILED_DESC = "실패시 500코드 반환";
     public static final String SOCIAL_USER_JOIN_EX_VAL = """
-            {
-              "userDTO": {
-                "name": "테스트 유저",
-                "nickname": "testNick1",
-                "phone": "01012345678",
-                "email": "test@example.com"
-              },
-              "addressDTO": {
-                "address1": "서울시",
-                "address2": "광진구",
-                "address3": "중곡동"
-              }
-            }
-            """;
+          {
+            "nickname": "testNick1",
+            "email": "test@example.com"
+          }
+          """;
 
     // 비밀번호 찾기용 이메일 인증번호 발송 요청
     public static final String FIND_PASSWORD_CERT_DESC = """
