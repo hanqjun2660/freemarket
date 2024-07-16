@@ -264,20 +264,19 @@ public class AccountController {
     @PostMapping("/social-user-join")
     public CommonResponse socialUserJoin(@RequestBody @Validated({ValidationGroups.requestSocialUserRegistValidation.class}) UserDTO userDTO) {
         try {
-            PrincipalDetails principalDetails = redisService.getSoicalTempData(userDTO.getEmail());
+            UserDTO redisUserTempData = redisService.getSoicalTempData(userDTO.getEmail());
 
-            log.info("soical temp data: {}", principalDetails.toString());
+            log.info("soical temp data: {}", redisUserTempData.toString());
 
-            userDTO.setMemberId(principalDetails.getMemberId());
-            userDTO.setProvider(principalDetails.getProvider());
-            userDTO.setName(principalDetails.getName());
-            userDTO.setProfileImg(principalDetails.getProfileImage());
+            userDTO.setMemberId(redisUserTempData.getMemberId());
+            userDTO.setProvider(redisUserTempData.getProvider());
+            userDTO.setName(redisUserTempData.getName());
+            userDTO.setProfileImg(redisUserTempData.getProfileImg());
 
             log.info("settings userDTO: {}", userDTO.toString());
 
             User joinUser = userService.joinSocialUser(userDTO);
-
-            log.info("social join principal: {}", principalDetails.getAttributes());
+            
             log.info("social join userDTO: {}", userDTO.toString());
 
             if(!ObjectUtils.isEmpty(joinUser)) {

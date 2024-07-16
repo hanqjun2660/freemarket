@@ -36,7 +36,7 @@ public class CustomOAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHa
         if(ObjectUtils.isEmpty(principalDetails.getMemberNo())) {
 
             // 소셜로 회원가입 진행해야하는 경우
-            redisService.setValues(principalDetails.getEmail(), principalDetails, Duration.ofMillis(600000));       // 10분
+            redisService.setValues(principalDetails.getEmail(), principalDetails.getUserDTO(), Duration.ofMillis(600000));       // 10분
 
             // HttpServletRequest에 있는 헤더를 모두 출력 (확인용)
             Map<String, String> headers = new HashMap<>();

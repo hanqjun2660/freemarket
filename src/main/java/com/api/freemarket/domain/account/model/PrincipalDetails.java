@@ -1,7 +1,6 @@
 package com.api.freemarket.domain.account.model;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -10,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 
+@Getter
 public class PrincipalDetails implements OAuth2User, UserDetails {
 
     private UserDTO userDTO;
@@ -22,8 +22,7 @@ public class PrincipalDetails implements OAuth2User, UserDetails {
     }
 
     // 소셜 로그인용 생성자
-    @JsonCreator
-    public PrincipalDetails(@JsonProperty("userDTO") UserDTO userDTO, @JsonProperty("attributes") Map<String, Object> attributes) {
+    public PrincipalDetails(UserDTO userDTO, Map<String, Object> attributes) {
         this.userDTO = userDTO;
         this.attributes = attributes;
     }
