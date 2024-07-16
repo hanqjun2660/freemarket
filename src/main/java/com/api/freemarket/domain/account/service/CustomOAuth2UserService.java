@@ -56,7 +56,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
         Optional<User> existUser = Optional.ofNullable(userRepository.findByMemberId(memberId));
 
-        if(existUser.isPresent()) {
+        if(!existUser.isPresent()) {
            /* User registUser = User.builder()
                     .name(oAuth2Response.getName())
                     .email(oAuth2Response.getEmail())
