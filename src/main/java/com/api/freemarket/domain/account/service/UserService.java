@@ -97,6 +97,18 @@ public class UserService implements UserDetailsService {
         return saveUser;
     }
 
+    @Transactional
+    public User joinSocialUser(UserDTO userDTO) {
+        User saveUser = userRepository.save(modelMapper.map(userDTO, User.class));
+        RoleDTO roleDTO = new RoleDTO();
+        roleDTO.setName(String.valueOf(RoleName.ROLE_USER));
+        roleDTO.setMemberNo(saveUser.getMemberNo());
+
+        roleRepository.save(modelMapper.map(roleDTO, Role.class));
+
+        return saveUser;
+    }
+
     public boolean existsByNickname(String nickname) {
         return userRepository.existsByNickname(nickname);
     }

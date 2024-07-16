@@ -5,7 +5,6 @@ import com.api.freemarket.domain.account.service.RedisService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -16,6 +15,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.util.*;
 
 @Component
@@ -29,18 +29,16 @@ public class CustomOAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHa
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
                                         Authentication authentication) throws IOException {
 
-        HttpSession session = request.getSession();
-
         PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
 
         log.info("oAuth data: {}", principalDetails.getAttributes());
 
         if(ObjectUtils.isEmpty(principalDetails.getMemberNo())) {
-            // 소셜로 회원가입 진행해야하는 경우
-            session.setAttribute(principalDetails.PRINCIPAL_SESSION_KEY , principalDetails);
-            /*response.addCookie(new Cookie("email", principalDetails.getEmail()));*/
 
-            // HttpServletRequest에 있는 헤더를 모두 출력
+            // 소셜로 회원가입 진행해야하는 경우
+            redisService.setValues(principalDetails.getEmail(), principalDetails, Duration.ofMillis(600000));       // 10분
+
+            // HttpServletRequest에 있는 헤더를 모두 출력 (확인용)
             Map<String, String> headers = new HashMap<>();
 
             Enumeration<String> headerNames = request.getHeaderNames();
@@ -52,14 +50,8 @@ public class CustomOAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHa
                 log.info(String.format("Header '%s' = %s", headerName, headerValue));
             }
 
-            String origin = request.getHeader("origin");
             String cookieDomain = "devsj.site";
 
-            if(origin != null && origin.contains("localhost")) {
-                cookieDomain = "localhost";
-            }
-
-            log.info("origin: {}", origin);
             log.info("cookieDomain: {}", cookieDomain);
 
             // 쿠키 설정 - sendRedirect 이전에 설정해야 합니다.

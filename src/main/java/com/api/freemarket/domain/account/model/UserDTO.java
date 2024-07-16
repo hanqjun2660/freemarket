@@ -25,7 +25,7 @@ public class UserDTO {
     @NotBlank(message = "비밀번호는 필수 항목 입니다.", groups = {ValidationGroups.joinValidation.class, ValidationGroups.loginValidation.class})
     private String password;
 
-    @NotBlank(groups = {ValidationGroups.joinValidation.class, ValidationGroups.NicknameValidation.class, ValidationGroups.addInfoValidation.class})
+    @NotBlank(groups = {ValidationGroups.joinValidation.class, ValidationGroups.NicknameValidation.class, ValidationGroups.addInfoValidation.class, ValidationGroups.requestSocialUserRegistValidation.class})
     @Pattern(regexp = "^[a-zA-Z0-9]{2,10}$", message = "닉네임은 영문과 숫자를 포함하여 2자리에서 10자리 사이여야 합니다.", groups = {ValidationGroups.joinValidation.class})
     private String nickname;
 
@@ -36,7 +36,7 @@ public class UserDTO {
 
     private String provider;
 
-    @NotBlank(message = "이메일은 필수 항목 입니다.", groups = {ValidationGroups.joinValidation.class, ValidationGroups.addInfoValidation.class})
+    @NotBlank(message = "이메일은 필수 항목 입니다.", groups = {ValidationGroups.joinValidation.class, ValidationGroups.addInfoValidation.class, ValidationGroups.requestSocialUserRegistValidation.class})
     @Email(message = "유효한 형식의 이메일이 아닙니다.", groups = {ValidationGroups.joinValidation.class, ValidationGroups.addInfoValidation.class})
     private String email;
 

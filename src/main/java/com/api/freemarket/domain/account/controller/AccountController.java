@@ -262,25 +262,18 @@ public class AccountController {
     })
     @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(examples = {@ExampleObject(value = SwaggerAccountDesc.SOCIAL_USER_JOIN_EX_VAL)}))
     @PostMapping("/social-user-join")
-    public CommonResponse socialUserJoin(@RequestBody UserAndAddressDTO userAndAddressDTO, HttpSession session) {
+    public CommonResponse socialUserJoin(@RequestBody @Validated({ValidationGroups.requestSocialUserRegistValidation.class}) UserDTO userDTO) {
         try {
-            PrincipalDetails principalDetails = (PrincipalDetails) session.getAttribute(PrincipalDetails.PRINCIPAL_SESSION_KEY);
+            PrincipalDetails principalDetails = redisService.getSoicalTempData(userDTO.getEmail());
 
-            log.info("soical user session data: {}", principalDetails.toString());
+            log.info("soical temp data: {}", principalDetails.toString());
 
-            String memberId = principalDetails.getMemberId();
-            String provider = principalDetails.getProvider();
+            userDTO.setMemberId(principalDetails.getMemberId());
+            userDTO.setProvider(principalDetails.getProvider());
+            userDTO.setName(principalDetails.getName());
+            userDTO.setProfileImg(principalDetails.getProfileImage());
 
-            log.info("session memberId: {}", memberId);
-            log.info("session provider: {}", provider);
-
-            UserDTO userDTO = userAndAddressDTO.getUserDTO();
-            AddressDTO addressDTO = userAndAddressDTO.getAddressDTO();
-
-            userDTO.setMemberId(memberId);
-            userDTO.setProvider(provider);
-
-            User joinUser = userService.joinUser(userDTO, addressDTO);
+            User joinUser = userService.joinSocialUser(userDTO);
 
             log.info("social join principal: {}", principalDetails.getAttributes());
             log.info("social join userDTO: {}", userDTO.toString());
