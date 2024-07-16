@@ -1,5 +1,6 @@
 package com.api.freemarket.domain.account.service;
 
+import com.api.freemarket.domain.account.model.PrincipalDetails;
 import com.api.freemarket.domain.account.model.RedisData;
 import com.api.freemarket.common.jwt.JWTUtil;
 import jakarta.servlet.http.HttpServletResponse;
@@ -46,6 +47,12 @@ public class RedisService {
         values.set(key, value, duration);
     }
 
+    // 소셜회원 임시 회원 정보 저장용
+    public void setValues(String key, PrincipalDetails principalDetails, Duration duration) {
+        ValueOperations<String, Object> values = redisTemplate.opsForValue();
+        values.set(key, principalDetails, duration);
+    }
+
     // redis에 저장된 refreshToken 삭제
     public void deleteValues(String key) {
         redisTemplate.delete(key);
@@ -54,6 +61,17 @@ public class RedisService {
     // redis에 저장된 refreshToken 조회
     public RedisData getValues(String key) {
         RedisData jsonValue = (RedisData) redisTemplate.opsForValue().get(key);
+
+        if(ObjectUtils.isEmpty(jsonValue)) {
+            return null;
+        }
+
+        return jsonValue;
+    }
+
+    // redis에 저장된 소셜 회원 임시정보 조회
+    public PrincipalDetails getSoicalTempData(String key) {
+        PrincipalDetails jsonValue = (PrincipalDetails) redisTemplate.opsForValue().get(key);
 
         if(ObjectUtils.isEmpty(jsonValue)) {
             return null;

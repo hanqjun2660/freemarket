@@ -11,4 +11,6 @@ public class ValidationGroups {
     public interface findIdValidation {}
     public interface requestTempPasswordValidation {}
     public interface requestFindIdValidation {}
+
+    public interface requestSocialUserRegistValidation {}
 }

@@ -41,7 +41,7 @@ public class PrincipalDetails implements OAuth2User, UserDetails {
     }
 
     public String getProfileImage() {
-        return userDTO.getProfileImg();
+        return userDTO.getProfileImg() != null ? userDTO.getProfileImg() : null;
     }
 
     public Long getMemberNo() {
