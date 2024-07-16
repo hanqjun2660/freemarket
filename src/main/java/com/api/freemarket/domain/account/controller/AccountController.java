@@ -265,8 +265,14 @@ public class AccountController {
     public CommonResponse socialUserJoin(@RequestBody UserAndAddressDTO userAndAddressDTO, HttpSession session) {
         try {
             PrincipalDetails principalDetails = (PrincipalDetails) session.getAttribute(PrincipalDetails.PRINCIPAL_SESSION_KEY);
+
+            log.info("soical user session data: {}", principalDetails.toString());
+
             String memberId = principalDetails.getMemberId();
             String provider = principalDetails.getProvider();
+
+            log.info("session memberId: {}", memberId);
+            log.info("session provider: {}", provider);
 
             UserDTO userDTO = userAndAddressDTO.getUserDTO();
             AddressDTO addressDTO = userAndAddressDTO.getAddressDTO();
