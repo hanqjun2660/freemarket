@@ -273,6 +273,8 @@ public class AccountController {
             userDTO.setName(principalDetails.getName());
             userDTO.setProfileImg(principalDetails.getProfileImage());
 
+            log.info("settings userDTO: {}", userDTO.toString());
+
             User joinUser = userService.joinSocialUser(userDTO);
 
             log.info("social join principal: {}", principalDetails.getAttributes());
