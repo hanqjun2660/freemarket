@@ -31,9 +31,10 @@ public class CustomOAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHa
 
         PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
 
+        log.info("user data: {}", principalDetails.getUserDTO().toString());
         log.info("oAuth data: {}", principalDetails.getAttributes());
 
-        if(ObjectUtils.isEmpty(principalDetails.getMemberNo())) {
+        if(principalDetails.getMemberNo() == null) {
 
             // 소셜로 회원가입 진행해야하는 경우
             redisService.setValues(principalDetails.getEmail(), principalDetails.getUserDTO(), Duration.ofMillis(600000));       // 10분
@@ -83,6 +84,8 @@ public class CustomOAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHa
 
             return;
         }
+
+        log.info("login....");
 
         // 소셜로 회원가입이 되어있어 로그인 처리 해야하는 경우
         Long userNo = principalDetails.getMemberNo();

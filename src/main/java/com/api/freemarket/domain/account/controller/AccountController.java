@@ -276,7 +276,7 @@ public class AccountController {
             log.info("settings userDTO: {}", userDTO.toString());
 
             User joinUser = userService.joinSocialUser(userDTO);
-            
+
             log.info("social join userDTO: {}", userDTO.toString());
 
             if(!ObjectUtils.isEmpty(joinUser)) {
