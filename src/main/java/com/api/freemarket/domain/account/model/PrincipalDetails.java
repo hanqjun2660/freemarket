@@ -1,5 +1,6 @@
 package com.api.freemarket.domain.account.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -10,19 +11,17 @@ import java.util.Map;
 
 public class PrincipalDetails implements OAuth2User, UserDetails {
 
-    public final static String PRINCIPAL_SESSION_KEY = "PRINCIPAL_SESSION_KEY";
-
     private UserDTO userDTO;
     
     private Map<String, Object> attributes;
-    
+
     // 일반 로그인용 생성자
     public PrincipalDetails(UserDTO userDTO) {
         this.userDTO = userDTO;
     }
 
     // 소셜 로그인용 생성자
-    public PrincipalDetails(UserDTO userDTO, Map<String, Object> attributes) {
+    public PrincipalDetails(@JsonProperty("userDTO") UserDTO userDTO, @JsonProperty("attributes") Map<String, Object> attributes) {
         this.userDTO = userDTO;
         this.attributes = attributes;
     }
