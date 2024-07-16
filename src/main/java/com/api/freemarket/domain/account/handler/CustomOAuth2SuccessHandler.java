@@ -87,6 +87,7 @@ public class CustomOAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHa
             response.setCharacterEncoding("UTF-8");
             response.getWriter().write("{\"status\": \"success\"}");
             response.setStatus(HttpStatus.FOUND.value());
+            response.sendRedirect("https://front.devsj.site/login/oauth2/code/" + principalDetails.getProvider());
 
             return;
         }
