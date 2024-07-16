@@ -34,6 +34,9 @@ public class CustomOAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHa
         log.info("user data: {}", principalDetails.getUserDTO().toString());
         log.info("oAuth data: {}", principalDetails.getAttributes());
 
+        Cookie cookie;
+        String cookieDomain = "devsj.site";
+
         if(principalDetails.getMemberNo() == null) {
 
             // 소셜로 회원가입 진행해야하는 경우
@@ -51,20 +54,13 @@ public class CustomOAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHa
                 log.info(String.format("Header '%s' = %s", headerName, headerValue));
             }
 
-            String cookieDomain = "devsj.site";
-
             log.info("cookieDomain: {}", cookieDomain);
 
             // 쿠키 설정 - sendRedirect 이전에 설정해야 합니다.
-            Cookie emailCookie = new Cookie("email", principalDetails.getEmail());
-            emailCookie.setDomain(cookieDomain);  // 공통 도메인 설정
-            emailCookie.setPath("/");  // 쿠키의 유효 경로 설정
-            emailCookie.setHttpOnly(false);  // JavaScript에서 쿠키 접근 가능 여부
-            emailCookie.setSecure(true);  // SameSite=None을 사용하려면 Secure도 true로 설정해야 함
-            emailCookie.setMaxAge(60 * 60);  // 쿠키 유효 기간 설정 (1시간)
+            cookie = createCookie("email", principalDetails.getEmail(), cookieDomain);
 
             // 도메인 설정을 제거하여 현재 호스트에 쿠키를 설정
-            response.addCookie(emailCookie);
+            response.addCookie(cookie);
 
             // SameSite=None 속성을 추가하기 위해 헤더를 수동으로 설정
             String cookieHeader = String.format(
@@ -100,10 +96,14 @@ public class CustomOAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHa
         response.setStatus(HttpStatus.OK.value());
     }
 
-    public Cookie createCookie(String key, String value) {
+    public Cookie createCookie(String key, String value, String cookieDomain) {
+
         Cookie cookie = new Cookie(key, value);
-        cookie.setMaxAge(60*10);
-        cookie.setHttpOnly(true);
+        cookie.setDomain(cookieDomain);  // 공통 도메인 설정
+        cookie.setPath("/");  // 쿠키의 유효 경로 설정
+        cookie.setHttpOnly(false);  // JavaScript에서 쿠키 접근 가능 여부
+        cookie.setSecure(true);  // SameSite=None을 사용하려면 Secure도 true로 설정해야 함
+        cookie.setMaxAge(60 * 60);  // 쿠키 유효 기간 설정 (1시간)
 
         return cookie;
     }
