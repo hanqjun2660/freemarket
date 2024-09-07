@@ -119,3 +119,15 @@ jasypt:
     algorithm: PBEWithMD5AndDES
     iv-generator-classname: org.jasypt.iv.NoIvGenerator
     string-output-type: base64
+
+cloud:
+  aws:
+    credentials:
+      accessKey:
+      secretKey:
+    region:
+      static: ap-northeast-2
+    stack:
+      auto: false
+    s3:
+      bucket: nafulbucket

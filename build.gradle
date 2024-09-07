@@ -35,6 +35,7 @@ dependencies {
 	implementation 'io.jsonwebtoken:jjwt-jackson:0.12.3'
 	implementation group: 'org.modelmapper', name: 'modelmapper', version: '3.1.1'
 	implementation group: 'com.github.ulisesbocchio', name: 'jasypt-spring-boot-starter', version: '3.0.4'
+	implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'com.h2database:h2'
 	/*runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'*/
